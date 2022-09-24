@@ -1,0 +1,61 @@
+{
+  "name": "@linkedmink/node-route53-dynamic-dns",
+  "version": "1.0.0-0",
+  "description": "",
+  "keywords": [
+    "AWS",
+    "Route53",
+    "DNS",
+    "Dynamic DNS"
+  ],
+  "type": "module",
+  "main": "build/index.mjs",
+  "types": "build/index.d.ts",
+  "license": "MIT",
+  "author": {
+    "name": "Harlan Sang",
+    "email": "harlan.sang@linkedmink.net"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LinkedMink/node-route53-dynamic-dns.git"
+  },
+  "scripts": {
+    "start": "ts-node --esm --project src/tsconfig.json --transpile-only --require dotenv/config src/index.mts",
+    "start:built": "node --enable-source-maps -r dotenv/config build/index.mjs",
+    "build": "rimraf build && tsc --project src/tsconfig.json",
+    "test": "jest --watchAll",
+    "test:ci": "jest --coverage --ci",
+    "test:debug": "jest --cache=false --detectOpenHandles --runInBand --watchAll",
+    "postinstall": "husky install || cd .",
+    "lint": "eslint {src,tests}/**/*.{m,c,}ts *.{,m,c}{j,t}s",
+    "doc": "typedoc"
+  },
+  "bin": {
+    "node-route53-dynamic-dns": "./build/index.mjs"
+  },
+  "dependencies": {
+    "@aws-sdk/client-route-53": "^3.178.0",
+    "dotenv": "^16.0.2",
+    "winston": "^3.8.2"
+  },
+  "devDependencies": {
+    "@tsconfig/node16": "^1.0.3",
+    "@types/jest": "^29.0.3",
+    "@types/node": "^16.11.60",
+    "@typescript-eslint/eslint-plugin": "^5.38.0",
+    "@typescript-eslint/parser": "^5.38.0",
+    "eslint": "^8.24.0",
+    "eslint-config-prettier": "^8.5.0",
+    "husky": "^8.0.1",
+    "jest": "^29.0.3",
+    "lint-staged": "^13.0.3",
+    "prettier": "^2.7.1",
+    "rimraf": "^3.0.2",
+    "ts-jest": "^29.0.2",
+    "ts-node": "^10.9.1",
+    "type-fest": "^3.0.0",
+    "typedoc": "^0.23.15",
+    "typescript": "^4.8.3"
+  }
+}

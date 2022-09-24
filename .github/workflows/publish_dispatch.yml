@@ -1,0 +1,25 @@
+name: Publish Dispatch
+concurrency: 
+  group: publish
+  cancel-in-progress: true
+on:
+  workflow_dispatch:
+    inputs:
+      uploadToTag:
+        type: string
+        required: true
+        description: 'Upload built Bundle to Github tag'
+
+jobs:
+  build:
+    uses: LinkedMink/node-route53-dynamic-dns/.github/workflows/build.yml@main
+    with:
+      uploadBuild: true
+  publish:
+    needs: build
+    uses: LinkedMink/node-route53-dynamic-dns/.github/workflows/publish.yml@main
+    with:
+      uploadToTag: ${{ github.event.inputs.uploadToTag }}
+      uploadedBuildName: ${{ needs.build.outputs.uploadedBuildName }} 
+    secrets:
+      REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}

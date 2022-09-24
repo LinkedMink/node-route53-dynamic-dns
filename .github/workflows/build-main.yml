@@ -1,0 +1,14 @@
+name: Build main
+concurrency: 
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+on:
+  push:
+    branches:
+    - main
+
+jobs:
+  build:
+    uses: LinkedMink/node-route53-dynamic-dns/.github/workflows/build.yml@main
+    with:
+      uploadBuild: false
