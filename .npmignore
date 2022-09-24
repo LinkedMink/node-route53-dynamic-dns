@@ -15,5 +15,3 @@
 .env.production.local
 
 *.log
-
-*.key*

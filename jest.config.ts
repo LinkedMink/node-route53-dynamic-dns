@@ -1,5 +1,7 @@
 import { Config } from "@jest/types";
 
+const ignoreCoverageFiles = ["index"];
+
 const config: Config.InitialOptions = {
   preset: "ts-jest/presets/default-esm",
   verbose: true,
@@ -10,25 +12,27 @@ const config: Config.InitialOptions = {
   },
   testMatch: ["**/tests/**/(*.test|*.spec).{m,c,}ts"],
   collectCoverage: false,
-  collectCoverageFrom: ["src/**/!(*.spec|*.test|*.enum).{m,c,}ts"],
-  coverageThreshold: {
-    global: {
-      statements: 75,
-      branches: 75,
-      functions: 75,
-      lines: 75,
-    },
-  },
+  collectCoverageFrom: [
+    `src/!(types)/**/!(${ignoreCoverageFiles.join("|")}|*.spec|*.test|*.enum).{m,c,}ts`,
+  ],
+  // coverageThreshold: {
+  //   global: {
+  //     statements: 75,
+  //     branches: 75,
+  //     functions: 75,
+  //     lines: 75,
+  //   },
+  // },
   coverageProvider: "v8",
   testEnvironment: "node",
   transform: {
-    "^.+\\.m?tsx?$": "ts-jest",
-  },
-  globals: {
-    "ts-jest": {
-      tsconfig: "tests/tsconfig.json",
-      useESM: true,
-    },
+    "^.+\\.m?tsx?$": [
+      "ts-jest",
+      {
+        tsconfig: "tests/tsconfig.json",
+        useESM: true,
+      },
+    ],
   },
 };
 
