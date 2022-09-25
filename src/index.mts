@@ -1,35 +1,50 @@
-import { ConfigKey } from "./constant/config-key.mjs";
+import { ConfigKey } from "./constants/config.mjs";
+import {
+  HostRecordsRetrievedEvent,
+  HostRecordsUpdatedEvent,
+  PublicIpCheckedEvent,
+} from "./constants/events.mjs";
 import { EnvironmentConfig } from "./environment/environment-config.mjs";
 import { initializeLogging } from "./environment/logger.mjs";
-import { IntervalPublicIpEventEmitter } from "./event-handlers/public-ip-event-emitter.mjs";
-import {
-  handlePublicIpForServer,
-  handleHostRecordsForServer,
-  startHttpHealthCheckServer,
-} from "./event-handlers/health-check-server.mjs";
-import { HostRecordUpdatedEvent, PublicIpCheckedEvent } from "./constant/events.mjs";
-import { PublicIpEventEmitter } from "./types/public-ip.mjs";
+import { HealthCheckServer } from "./event-handlers/health-check-server.mjs";
+import { PublicIpClient } from "./event-handlers/public-ip-event-emitter.mjs";
 import { Route53HostRecordUpdater } from "./event-handlers/route53-host-record-updater.mjs";
-import { HostRecordEventEmitter } from "./types/host-record.mjs";
+import { Route53UpdateClient } from "./services/route53-update-client.mjs";
+import { DnsZoneRecordClient } from "./types/dns-zone-record-client.mjs";
+import { HostRecordEventEmitter } from "./types/host-record-events.mjs";
+import { PublicIpEventEmitter } from "./types/public-ip-events.mjs";
 
 const config = new EnvironmentConfig();
 const logger = initializeLogging(config);
 
-logger.verbose("Initializing");
+logger.verbose("Initializing Main");
 
-const client: PublicIpEventEmitter = new IntervalPublicIpEventEmitter(
-  config.getNumber(ConfigKey.CheckIntervalSeconds) * 1000
+const awsAccessKeyId = config.getString(ConfigKey.AwsAccessKeyId);
+const awsAccessKeySecret = config.getString(ConfigKey.AwsAccessKeySecret);
+const route53Client: DnsZoneRecordClient = new Route53UpdateClient(
+  awsAccessKeyId,
+  awsAccessKeySecret
 );
-client.on(PublicIpCheckedEvent, handlePublicIpForServer);
 
-const route53Updater: HostRecordEventEmitter = new Route53HostRecordUpdater(
-  config.getJson(ConfigKey.HostsToUpdate)
-);
-client.on(PublicIpCheckedEvent, route53Updater.handlePublicIpUpdate);
+const route53Updater: HostRecordEventEmitter = new Route53HostRecordUpdater(route53Client);
 
-route53Updater.on(HostRecordUpdatedEvent, handleHostRecordsForServer);
+const ipUpdateInterval = config.getNumber(ConfigKey.CheckIntervalSeconds) * 1000;
+const publicIpClient: PublicIpEventEmitter = new PublicIpClient(ipUpdateInterval);
+publicIpClient.on(PublicIpCheckedEvent, route53Updater.handlePublicIpUpdate);
 
-client.start();
-await startHttpHealthCheckServer(config.getNumber(ConfigKey.Port));
+const port = config.getNumberOrNull(ConfigKey.BindPort);
+if (port !== null) {
+  const healthCheckServer = new HealthCheckServer();
+  route53Updater.on(HostRecordsRetrievedEvent, healthCheckServer.handleHostRecordsEvent);
+  route53Updater.on(HostRecordsUpdatedEvent, healthCheckServer.handleHostRecordsEvent);
+  publicIpClient.on(PublicIpCheckedEvent, healthCheckServer.handlePublicIpEvent);
 
-logger.verbose("Initialized");
+  const host = config.getStringOrNull(ConfigKey.BindHost);
+  await healthCheckServer.start(port, host !== null ? host : undefined);
+}
+
+const hostnames = config.getJson<string[]>(ConfigKey.HostnamesToUpdate);
+await route53Updater.initialize(hostnames);
+publicIpClient.start();
+
+logger.verbose("Initialized Main");

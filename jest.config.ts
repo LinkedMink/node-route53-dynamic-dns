@@ -12,9 +12,7 @@ const config: Config.InitialOptions = {
   },
   testMatch: ["**/tests/**/(*.test|*.spec).{m,c,}ts"],
   collectCoverage: false,
-  collectCoverageFrom: [
-    `src/!(types)/**/!(${ignoreCoverageFiles.join("|")}|*.spec|*.test|*.enum).{m,c,}ts`,
-  ],
+  collectCoverageFrom: [`src/!(types|constants)/**/!(${ignoreCoverageFiles.join("|")}).{m,c,}ts`],
   // coverageThreshold: {
   //   global: {
   //     statements: 75,

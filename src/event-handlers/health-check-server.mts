@@ -1,52 +1,54 @@
 import http, { Http2Server, Http2ServerRequest, Http2ServerResponse } from "http2";
-import { getLogger } from "../environment/logger.mjs";
-import { HostRecordState } from "../types/host-record.mjs";
-import { PublicIpState } from "../types/public-ip.mjs";
-import { HealthCheckResponse, HealthCheckState } from "../types/response.mjs";
+import { loggerForModuleUrl } from "../environment/logger.mjs";
+import { HostRecord, HostRecordState } from "../types/host-record-events.mjs";
+import { IpAddresses, PublicIpState } from "../types/public-ip-events.mjs";
+import { HealthCheckResponse } from "../types/health-response.mjs";
 
-const state: HealthCheckState = {
-  publicIpAddresses: {},
-  lastCheckDateTime: new Date(),
-  lastUpdateDateTime: null,
-  hostRecords: null,
-};
+export class HealthCheckServer {
+  private readonly logger = loggerForModuleUrl(import.meta.url);
 
-export const handleHostRecordsForServer = (event: HostRecordState) => {
-  state.hostRecords = event.hostRecordsUpdated;
-  state.lastUpdateDateTime = event.lastUpdateDateTime;
-};
+  private startDateTime = new Date();
+  private publicIpAddresses: IpAddresses | null = null;
+  private lastPublicIpDateTime: Date | null = null;
+  private lastUpdateDateTime: Date | null = null;
+  private hostRecords: HostRecord[] | null = null;
 
-export const handlePublicIpForServer = (event: PublicIpState) => {
-  state.publicIpAddresses = event.publicIpAddresses;
-  state.lastCheckDateTime = event.lastCheckDateTime;
-};
+  start = async (port: number, hostname?: string): Promise<Http2Server> => {
+    this.startDateTime = new Date();
 
-export const startHttpHealthCheckServer = async (port: number): Promise<Http2Server> => {
-  const startDateTime = new Date();
-  const logger = getLogger(import.meta.url);
+    this.logger.verbose(`Health check server starting on port: ${port}`);
 
-  logger.verbose(`Health check server starting on port: ${port}`);
+    const server = http.createServer(this.handleHttpRequest);
+    await new Promise<void>((resolve, _reject) => {
+      server.listen(port, hostname, resolve);
+    });
 
-  const healthCheckHandler = (req: Http2ServerRequest, res: Http2ServerResponse) => {
-    logger.http(`Handling health check from: ${req.socket.remoteAddress}`);
+    this.logger.info(`Health check server listening on port: ${port}`);
+
+    return server;
+  };
+
+  handleHostRecordsEvent = (event: HostRecordState) => {
+    this.hostRecords = event.hostRecords;
+    this.lastUpdateDateTime = event.lastUpdateDateTime;
+  };
+
+  handlePublicIpEvent = (event: PublicIpState) => {
+    this.publicIpAddresses = event.publicIpAddresses;
+    this.lastPublicIpDateTime = event.lastPublicIpDateTime;
+  };
+
+  private handleHttpRequest = (req: Http2ServerRequest, res: Http2ServerResponse) => {
+    this.logger.http(`Handling health check from: ${req.socket.remoteAddress}`);
 
     const responseData: HealthCheckResponse = {
-      publicIpAddresses: state.publicIpAddresses,
-      lastUpdateDateTime: state.lastUpdateDateTime?.toISOString() || null,
-      lastCheckDateTime: state.lastCheckDateTime.toISOString(),
-      hostRecords: state.hostRecords,
-      uptimeMs: Date.now() - startDateTime.getTime(),
+      publicIpAddresses: this.publicIpAddresses,
+      lastUpdateDateTime: this.lastUpdateDateTime?.toISOString() || null,
+      lastPublicIpDateTime: this.lastPublicIpDateTime?.toISOString() || null,
+      hostRecords: this.hostRecords,
+      uptimeMs: Date.now() - this.startDateTime.getTime(),
     };
 
     res.end(JSON.stringify(responseData));
   };
-
-  const server = http.createServer(healthCheckHandler);
-  await new Promise<void>((resolve, _reject) => {
-    server.listen(port, resolve);
-  });
-
-  logger.info(`Health check server listening on port: ${port}`);
-
-  return server;
-};
+}

@@ -1,4 +1,4 @@
-import { formatError } from "../../src/environment/logger.mjs";
+import { formatError } from "../../src/functions/format.mjs";
 
 describe(formatError.name, () => {
   test("should format as stack trace when type is error", () => {
@@ -6,7 +6,7 @@ describe(formatError.name, () => {
 
     const result = formatError(error);
 
-    expect(result).toContain("logger.test.ts:5");
+    expect(result).toContain("format.test.ts:5");
   });
 
   test("should format as string when type is string", () => {
@@ -32,6 +32,6 @@ describe(formatError.name, () => {
 
     const result = formatError(error);
 
-    expect(result).toContain("logger.mts:94");
+    expect(result).toContain("format.mts:12");
   });
 });

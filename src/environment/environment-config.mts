@@ -1,20 +1,18 @@
 import dotenv from "dotenv";
 import fs from "fs";
 import { PackageJson } from "type-fest";
-import { configDefaultMap, ConfigKey } from "../constant/config-key.mjs";
-
-const IS_CONTAINERIZED_ENV_VAR = "IS_CONTAINER_ENV";
-
-enum Environment {
-  Development = "development",
-  Production = "production",
-}
+import {
+  configDefaultMap,
+  ConfigKey,
+  IS_CONTAINERIZED_ENV_VAR,
+  NodeEnv,
+} from "../constants/config.mjs";
 
 export class EnvironmentConfig {
   private readonly fileBuffers = new Map<ConfigKey, Buffer>();
   private readonly jsonData = new Map<ConfigKey, unknown>();
   private readonly packageJsonValue: PackageJson;
-  private readonly environment = process.env.NODE_ENV?.toLowerCase() ?? Environment.Development;
+  private readonly environment = process.env.NODE_ENV?.toLowerCase() ?? NodeEnv.Local;
 
   constructor() {
     const dotEnvFile = `.env.${this.environment}`;
@@ -28,11 +26,11 @@ export class EnvironmentConfig {
   }
 
   public get isEnvironmentLocal(): boolean {
-    return this.environment === Environment.Development;
+    return this.environment === NodeEnv.Local;
   }
 
   public get isEnvironmentProd(): boolean {
-    return this.environment === Environment.Production;
+    return this.environment === NodeEnv.Production;
   }
 
   public get isEnvironmentContainerized(): boolean {
@@ -47,9 +45,18 @@ export class EnvironmentConfig {
     return this.getConfigValue(key);
   };
 
+  public getStringOrNull = (key: ConfigKey): string | null => {
+    return this.getConfigValueOrNull(key);
+  };
+
   public getNumber = (key: ConfigKey): number => {
     const value = this.getConfigValue(key);
     return Number(value);
+  };
+
+  public getNumberOrNull = (key: ConfigKey): number | null => {
+    const value = this.getConfigValueOrNull(key);
+    return value !== null ? Number(value) : null;
   };
 
   public getBool = (key: ConfigKey): boolean => {
@@ -100,16 +107,22 @@ export class EnvironmentConfig {
   };
 
   private getConfigValue = (key: ConfigKey): string => {
-    let configValue = process.env[key];
+    const configValue = process.env[key] || configDefaultMap.get(key);
     if (configValue) {
       return configValue;
     }
 
-    configValue = configDefaultMap.get(key);
-    if (configValue !== undefined) {
+    throw new Error(`Environmental variable must be defined: ${key}`);
+  };
+
+  private getConfigValueOrNull = (key: ConfigKey): string | null => {
+    const configValue =
+      typeof process.env[key] === "string" ? process.env[key] : configDefaultMap.get(key);
+
+    if (typeof configValue === "string") {
       return configValue;
     }
 
-    throw new Error(`Environmental variable must be defined: ${key}`);
+    return null;
   };
 }

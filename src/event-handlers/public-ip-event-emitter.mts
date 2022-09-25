@@ -1,21 +1,13 @@
 import EventEmitter from "events";
-import { publicIpv4, publicIpv6 } from "public-ip";
+import { IpNotFoundError, publicIpv4, publicIpv6 } from "public-ip";
 import { setInterval } from "timers/promises";
-import { PublicIpCheckedEvent } from "../constant/events.mjs";
-import { getLogger } from "../environment/logger.mjs";
-import { IpAddresses, PublicIpEventEmitter, PublicIpState } from "../types/public-ip.mjs";
+import { PublicIpCheckedEvent } from "../constants/events.mjs";
+import { loggerForModuleUrl } from "../environment/logger.mjs";
+import { formatError } from "../functions/format.mjs";
+import { PublicIpEventEmitter, PublicIpState } from "../types/public-ip-events.mjs";
 
-export class IntervalPublicIpEventEmitter extends EventEmitter implements PublicIpEventEmitter {
-  private readonly logger = getLogger(import.meta.url);
-
-  private _state: PublicIpState | null = null;
-  public get state(): PublicIpState {
-    if (!this._state) {
-      throw new Error(`${IntervalPublicIpEventEmitter.name} has not been started`);
-    }
-
-    return this._state;
-  }
+export class PublicIpClient extends EventEmitter implements PublicIpEventEmitter {
+  private readonly logger = loggerForModuleUrl(import.meta.url);
 
   constructor(readonly updateIntervalMs: number) {
     super();
@@ -23,22 +15,54 @@ export class IntervalPublicIpEventEmitter extends EventEmitter implements Public
 
   async *start(): AsyncGenerator<PublicIpState> {
     for await (const _ of setInterval(this.updateIntervalMs)) {
-      const publicIpAddresses = await this.getPublicIpAddresses();
-      const currentState: PublicIpState = {
-        publicIpAddresses,
-        lastCheckDateTime: new Date(),
-      };
-      this._state = currentState;
-      this.emit(PublicIpCheckedEvent, currentState);
-      yield currentState;
+      const state = await this.updatePublicIpState();
+      yield state;
     }
   }
 
-  private getPublicIpAddresses = async (): Promise<IpAddresses> => {
-    this.logger.debug("Getting latest IP");
-    const [ipV4, ipV6] = await Promise.all([publicIpv4(), publicIpv6()]);
-    this.logger.info(`Getting latest IP - Finished: v4=${ipV4}, v6=${ipV6}`);
+  private updatePublicIpState = async (): Promise<PublicIpState> => {
+    this.logger.debug("Getting latest public IP");
+    const [ipV4, ipV6] = await Promise.all([this.getPublicIpV4(), this.getPublicIpV6()]);
 
-    return { v4: ipV4, v6: ipV6 };
+    const state: PublicIpState = {
+      publicIpAddresses: {
+        v4: ipV4,
+        v6: ipV6,
+      },
+      lastPublicIpDateTime: new Date(),
+    };
+
+    this.logger.info(`Emitting public IPs to check: v4=${ipV4}, v6=${ipV6}`);
+
+    this.emit(PublicIpCheckedEvent, state);
+    return state;
+  };
+
+  private getPublicIpV4 = async (): Promise<string | null> => {
+    try {
+      return await publicIpv4();
+    } catch (error: unknown) {
+      this.logIpError(error, "V4");
+      return null;
+    }
+  };
+
+  private getPublicIpV6 = async (): Promise<string | null> => {
+    try {
+      return await publicIpv6();
+    } catch (error: unknown) {
+      this.logIpError(error, "V6");
+      return null;
+    }
+  };
+
+  private logIpError = (error: unknown, version: string): void => {
+    if (error instanceof IpNotFoundError) {
+      this.logger.verbose(
+        `Could not determine IP ${version}. It may not be assigned, or this may indicate another problem (no internet access, etc.)`
+      );
+    } else {
+      this.logger.error(formatError(error));
+    }
   };
 }

@@ -1,27 +1,11 @@
 import path from "path";
 import { fileURLToPath } from "url";
-import { isNativeError } from "util/types";
 import * as winston from "winston";
 import TransportStream from "winston-transport";
-import { ConfigKey } from "../constant/config-key.mjs";
+import { ConfigKey } from "../constants/config.mjs";
+import { DEFAULT_LOGGER_LABEL, DEFAULT_LOG_LEVEL, LogLevel } from "../constants/logging.mjs";
+import { formatError } from "../functions/format.mjs";
 import { EnvironmentConfig } from "./environment-config.mjs";
-import { isStringConvertable } from "./type-check.mjs";
-
-/**
- * @see winston.config.NpmConfigSetLevels
- */
-export enum LogLevel {
-  error = 0,
-  warn,
-  info,
-  http,
-  verbose,
-  debug,
-  silly,
-}
-
-const DEFAULT_LOGGER_LABEL = "AppGlobal";
-const DEFAULT_LOG_LEVEL = LogLevel[LogLevel.info];
 
 const getDefaultFormat = (label: string): winston.Logform.Format => {
   return winston.format.combine(
@@ -62,7 +46,7 @@ let loggerOptionsFunc = getDefaultOptions;
  * @param label The label of the module we're logging
  * @return An instance of the logger
  */
-export const getLogger = (label = DEFAULT_LOGGER_LABEL): winston.Logger => {
+export const loggerForLabel = (label = DEFAULT_LOGGER_LABEL): winston.Logger => {
   if (!winston.loggers.has(label)) {
     winston.loggers.add(label, loggerOptionsFunc(label));
   }
@@ -74,25 +58,29 @@ export const getLogger = (label = DEFAULT_LOGGER_LABEL): winston.Logger => {
  * @param moduleUrl Use {@link ImportMeta.url import.meta.url} for ESM modules to generate label
  * @return An instance of the logger
  */
-export const getFromModuleUrl = (moduleUrl: string): winston.Logger => {
+export const loggerForModuleUrl = (moduleUrl: string): winston.Logger => {
   const moduleFilename = path.basename(fileURLToPath(moduleUrl));
   const moduleName = moduleFilename.substring(
     0,
     moduleFilename.length - path.extname(moduleFilename).length
   );
-  return getLogger(moduleName);
+  return loggerForLabel(moduleName);
 };
 
-export const formatError = (error: unknown): string => {
-  if (isNativeError(error)) {
-    return error.stack as string;
-  } else if (typeof error === "string") {
-    return error;
-  } else if (isStringConvertable(error)) {
-    return error.toString();
-  } else {
-    const stack = new Error().stack as string;
-    return `Unspecified Unhandled Error: ${stack}`;
+/**
+ * Wrap expensive operations, so we don't perform them for logging unless logging for the level is enabled
+ * @param logger
+ * @param level
+ * @param messageFunc
+ */
+export const logWhenEnabled = (
+  logger: winston.Logger,
+  level: LogLevel,
+  messageFunc: () => string
+): void => {
+  const loggerLevel = LogLevel[logger.level as keyof typeof LogLevel];
+  if (typeof loggerLevel === "number" && level <= loggerLevel) {
+    logger.log(LogLevel[level], messageFunc());
   }
 };
 
@@ -126,7 +114,7 @@ export const initializeLogging = (config: EnvironmentConfig): winston.Logger => 
 
   loggerOptionsFunc = getLoggerOptions;
 
-  const logger = getLogger();
+  const logger = loggerForLabel();
   process.on("uncaughtException", (error: unknown) => {
     logger.error(`uncaughtException: ${formatError(error)}`);
   });
