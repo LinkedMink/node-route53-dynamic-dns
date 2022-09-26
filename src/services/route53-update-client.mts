@@ -1,5 +1,6 @@
 import { Change, ChangeStatus, Route53 } from "@aws-sdk/client-route-53";
 import { setTimeout } from "timers/promises";
+import { CHANGE_INSYNC_INTERVAL_MS, CHANGE_INSYNC_LIMIT_MS } from "../constants/behavior.mjs";
 import { LogLevel } from "../constants/logging.mjs";
 import { loggerForModuleUrl, logWhenEnabled } from "../environment/logger.mjs";
 import {
@@ -8,15 +9,13 @@ import {
   DnsZoneRecordSets,
 } from "../types/dns-zone-record-client.mjs";
 
-const CHANGE_INSYNC_INTERVAL_MS = 15_000;
-const CHANGE_INSYNC_LIMIT_MS = 5 * 60 * 1000;
-
 export class Route53UpdateClient implements DnsZoneRecordClient {
   private readonly logger = loggerForModuleUrl(import.meta.url);
   private readonly client: Route53;
 
   constructor(awsAccessKeyId: string, awsAccessKeySecret: string) {
     this.client = new Route53({
+      region: "REGION",
       credentials: {
         accessKeyId: awsAccessKeyId,
         secretAccessKey: awsAccessKeySecret,
@@ -24,20 +23,20 @@ export class Route53UpdateClient implements DnsZoneRecordClient {
     });
   }
 
-  getZoneRecords = async (hostNamesToMatch: string[]): Promise<DnsZoneRecordSets[]> => {
-    this.logger.verbose(`Find matching records for hostnames: ${hostNamesToMatch.toString()}`);
-    const zonesToUpdate = await this.getZonesForHostNames(hostNamesToMatch);
+  getZoneRecords = async (dnsRecordsToMatch: string[]): Promise<DnsZoneRecordSets[]> => {
+    this.logger.verbose(`Find matching records for DNS records: ${dnsRecordsToMatch.toString()}`);
 
-    const pendingRequest = Array.from(zonesToUpdate).map(([zoneId, hostNames]) => {
-      return this.getRecordsForZone(zoneId, hostNames);
+    const zonesToUpdate = await this.getZonesForDnsRecords(dnsRecordsToMatch);
+    const pendingRequest = Array.from(zonesToUpdate).map(([zoneId, dnsRecords]) => {
+      return this.getRecordsForZone(zoneId, dnsRecords);
     });
 
     const matchedZoneRecords = await Promise.all(pendingRequest);
 
     this.logger.verbose(
-      `Found matching records for hostnames: count=${
+      `Found matching records for DNS records: count=${
         matchedZoneRecords.length
-      }, host=${hostNamesToMatch.toString()}`
+      }, host=${dnsRecordsToMatch.toString()}`
     );
     logWhenEnabled(
       this.logger,
@@ -50,6 +49,7 @@ export class Route53UpdateClient implements DnsZoneRecordClient {
 
   updateZoneRecords = async (zoneRecords: DnsZoneRecordSets[]): Promise<Map<string, boolean>> => {
     this.logger.verbose(`Update records for zones: ${zoneRecords.length}`);
+
     const pendingRequest = zoneRecords.map(z => this.updateRecordsForZone(z));
     const statuses = await Promise.all(pendingRequest);
 
@@ -65,9 +65,7 @@ export class Route53UpdateClient implements DnsZoneRecordClient {
     );
   };
 
-  private getZonesForHostNames = async (
-    hostNamesToMatch: string[]
-  ): Promise<Map<string, string[]>> => {
+  getZonesForDnsRecords = async (dnsRecordsToMatch: string[]): Promise<Map<string, string[]>> => {
     this.logger.http("listHostedZones request");
     const response = await this.client.listHostedZones({});
 
@@ -75,38 +73,42 @@ export class Route53UpdateClient implements DnsZoneRecordClient {
       throw new Error("listHostedZones no HostedZones in response");
     }
 
-    const zones = response.HostedZones.map(z => ({
-      id: z.Id ?? "",
-      name: z.Name?.toLowerCase() ?? "",
-    })).filter(z => z.id && z.name);
+    const zones = response.HostedZones.filter(z => z.Id && z.Name).map(z => ({
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      id: z.Id!,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      name: z.Name!,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      isInZoneRegEx: new RegExp(`(${z.Name!.replace(".", "\\.")})$`),
+    }));
 
     logWhenEnabled(this.logger, LogLevel.debug, () => {
       const zoneNames = zones.map(z => `id=${z.id}, name=${z.name}`).join("; ");
       return `Found zones: ${zoneNames}`;
     });
 
-    const hostNames = hostNamesToMatch.map(n => n.toLowerCase());
-    return hostNames.reduce((zoneIdToHostNames, nextHostName) => {
-      const zoneToUpdate = zones.find(z => nextHostName.endsWith(z.name));
+    const dnsRecords = dnsRecordsToMatch.map(h => h.trim());
+    return dnsRecords.reduce((zoneIdToDnsRecords, nextDnsRecord) => {
+      const zoneToUpdate = zones.find(z => z.isInZoneRegEx.test(nextDnsRecord));
       if (!zoneToUpdate) {
-        this.logger.warn(`No zone matches the host name, it will be skipped: ${nextHostName}`);
-        return zoneIdToHostNames;
+        this.logger.warn(`No zone matches the host name, it will be skipped: ${nextDnsRecord}`);
+        return zoneIdToDnsRecords;
       }
 
-      const hostNames = zoneIdToHostNames.get(zoneToUpdate.id);
-      if (hostNames) {
-        hostNames.push(nextHostName);
+      const dnsRecords = zoneIdToDnsRecords.get(zoneToUpdate.id);
+      if (dnsRecords) {
+        dnsRecords.push(nextDnsRecord);
       } else {
-        zoneIdToHostNames.set(zoneToUpdate.id, [nextHostName]);
+        zoneIdToDnsRecords.set(zoneToUpdate.id, [nextDnsRecord]);
       }
 
-      return zoneIdToHostNames;
+      return zoneIdToDnsRecords;
     }, new Map<string, string[]>());
   };
 
   private getRecordsForZone = async (
     zoneId: string,
-    hostNames: string[]
+    dnsRecords: string[]
   ): Promise<DnsZoneRecordSets> => {
     this.logger.http(`listResourceRecordSets request for zone: ${zoneId}`);
     const response = await this.client.listResourceRecordSets({ HostedZoneId: zoneId });
@@ -115,9 +117,9 @@ export class Route53UpdateClient implements DnsZoneRecordClient {
       throw new Error("listResourceRecordSets no ResourceRecordSets in response");
     }
 
-    const hostNameSet = new Set(hostNames);
+    const dnsRecordSet = new Set(dnsRecords);
     const records = response.ResourceRecordSets.filter(
-      rs => rs.Name && hostNameSet.has(rs.Name) && (rs.Type === "A" || rs.Type === "AAAA")
+      rs => rs.Name && dnsRecordSet.has(rs.Name) && (rs.Type === "A" || rs.Type === "AAAA")
     ) as DnsHostRecordSet[];
 
     logWhenEnabled(this.logger, LogLevel.debug, () => {
@@ -125,11 +127,11 @@ export class Route53UpdateClient implements DnsZoneRecordClient {
       return `Found records for zone: zoneId=${zoneId}, ${recordsString}`;
     });
 
-    const foundHostNames = new Set(records.map(r => r.Name));
-    const missingHostNames = hostNames.filter(n => !foundHostNames.has(n));
-    if (missingHostNames.length > 0) {
+    const foundDnsRecords = new Set(records.map(r => r.Name));
+    const missingDnsRecords = dnsRecords.filter(n => !foundDnsRecords.has(n));
+    if (missingDnsRecords.length > 0) {
       this.logger.warn(
-        `No host records were found in zone, they will be skipped: zoneId=${zoneId}, missing=${missingHostNames.toString()}`
+        `No host records were found in zone, they will be skipped: zoneId=${zoneId}, missing=${missingDnsRecords.toString()}`
       );
     }
 
@@ -155,6 +157,13 @@ export class Route53UpdateClient implements DnsZoneRecordClient {
       throw new Error("changeResourceRecordSets no ChangeInfo.Id in response");
     }
 
+    logWhenEnabled(
+      this.logger,
+      LogLevel.debug,
+      () =>
+        `Records updated for zone: changeId=${changeId}, ${JSON.stringify(zoneRecords, null, 2)}`
+    );
+
     const hasSucceeded = await this.getChangeStatusUntilInSync(
       changeId,
       response.ChangeInfo?.Status
@@ -174,6 +183,9 @@ export class Route53UpdateClient implements DnsZoneRecordClient {
     if (status === "INSYNC") {
       return true;
     } else if (Date.now() - startTime > CHANGE_INSYNC_LIMIT_MS) {
+      this.logger.warn(
+        `Change not in sync after time limit: id=${changeId}, limit=${CHANGE_INSYNC_LIMIT_MS}`
+      );
       return false;
     }
 

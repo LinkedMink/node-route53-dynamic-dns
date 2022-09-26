@@ -16,6 +16,7 @@ export interface DnsZoneRecordSets {
 }
 
 export interface DnsZoneRecordClient {
-  getZoneRecords(hostNamesToMatch: string[]): Promise<DnsZoneRecordSets[]>;
+  getZoneRecords(dnsRecordsToMatch: string[]): Promise<DnsZoneRecordSets[]>;
+  getZonesForDnsRecords(dnsRecordsToMatch: string[]): Promise<Map<string, string[]>>;
   updateZoneRecords(zoneRecords: DnsZoneRecordSets[]): Promise<Map<string, boolean>>;
 }

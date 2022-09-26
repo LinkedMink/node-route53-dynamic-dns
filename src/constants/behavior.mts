@@ -1,0 +1,4 @@
+export const MINIMUM_IP_UPDATE_INTERVAL_MS = 1_000;
+
+export const CHANGE_INSYNC_INTERVAL_MS = 15_000;
+export const CHANGE_INSYNC_LIMIT_MS = 5 * 60 * 1000;

@@ -17,7 +17,7 @@ export interface HostRecordState {
 export type HostRecordUpdatedEventHandler = (event: HostRecordState) => void;
 
 export interface HostRecordEventEmitter extends EventEmitter {
-  initialize(hostNamesToUpdate: string[]): Promise<void>;
+  initialize(dnsRecordsToUpdate: string[]): Promise<void>;
   handlePublicIpUpdate: PublicIpEventHandler;
   on(eventName: typeof HostRecordsRetrievedEvent, listener: HostRecordUpdatedEventHandler): this;
   on(eventName: typeof HostRecordsUpdatedEvent, listener: HostRecordUpdatedEventHandler): this;

@@ -1,6 +1,7 @@
 import EventEmitter from "events";
 import { IpNotFoundError, publicIpv4, publicIpv6 } from "public-ip";
 import { setInterval } from "timers/promises";
+import { MINIMUM_IP_UPDATE_INTERVAL_MS } from "../constants/behavior.mjs";
 import { PublicIpCheckedEvent } from "../constants/events.mjs";
 import { loggerForModuleUrl } from "../environment/logger.mjs";
 import { formatError } from "../functions/format.mjs";
@@ -11,14 +12,17 @@ export class PublicIpClient extends EventEmitter implements PublicIpEventEmitter
 
   constructor(readonly updateIntervalMs: number) {
     super();
-  }
-
-  async *start(): AsyncGenerator<PublicIpState> {
-    for await (const _ of setInterval(this.updateIntervalMs)) {
-      const state = await this.updatePublicIpState();
-      yield state;
+    if (this.updateIntervalMs < MINIMUM_IP_UPDATE_INTERVAL_MS) {
+      throw new Error(`updateIntervalMs must be at least: ${MINIMUM_IP_UPDATE_INTERVAL_MS}ms`);
     }
   }
+
+  start = async (): Promise<void> => {
+    await this.updatePublicIpState();
+    for await (const _ of setInterval(this.updateIntervalMs)) {
+      await this.updatePublicIpState();
+    }
+  };
 
   private updatePublicIpState = async (): Promise<PublicIpState> => {
     this.logger.debug("Getting latest public IP");

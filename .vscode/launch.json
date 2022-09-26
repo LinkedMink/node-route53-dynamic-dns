@@ -12,7 +12,14 @@
       "outputCapture": "std"
     },
     {
-      "command": "npm test:debug",
+      "command": "npm run script:create-policy-json",
+      "name": "Run npm script:create-policy-json",
+      "request": "launch",
+      "type": "node-terminal",
+      "outputCapture": "std"
+    },
+    {
+      "command": "npm run test:debug",
       "name": "Run npm test:debug",
       "request": "launch",
       "type": "node-terminal",

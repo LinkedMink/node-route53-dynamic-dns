@@ -14,6 +14,6 @@ export interface PublicIpState {
 export type PublicIpEventHandler = (event: PublicIpState) => void;
 
 export interface PublicIpEventEmitter extends EventEmitter {
-  start(): AsyncGenerator<PublicIpState>;
+  start(): Promise<void>;
   on(eventName: typeof PublicIpCheckedEvent, listener: PublicIpEventHandler): this;
 }

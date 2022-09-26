@@ -9,6 +9,7 @@ import { initializeLogging } from "./environment/logger.mjs";
 import { HealthCheckServer } from "./event-handlers/health-check-server.mjs";
 import { PublicIpClient } from "./event-handlers/public-ip-event-emitter.mjs";
 import { Route53HostRecordUpdater } from "./event-handlers/route53-host-record-updater.mjs";
+import { validateNormalizeDnsRecord } from "./functions/validate.mjs";
 import { Route53UpdateClient } from "./services/route53-update-client.mjs";
 import { DnsZoneRecordClient } from "./types/dns-zone-record-client.mjs";
 import { HostRecordEventEmitter } from "./types/host-record-events.mjs";
@@ -43,8 +44,9 @@ if (port !== null) {
   await healthCheckServer.start(port, host !== null ? host : undefined);
 }
 
-const hostnames = config.getJson<string[]>(ConfigKey.HostnamesToUpdate);
-await route53Updater.initialize(hostnames);
-publicIpClient.start();
+const inputHostnames = config.getJson<string[]>(ConfigKey.HostnamesToUpdate);
+const dnsRecords = inputHostnames.map(validateNormalizeDnsRecord);
+await route53Updater.initialize(dnsRecords);
+void publicIpClient.start();
 
 logger.verbose("Initialized Main");
