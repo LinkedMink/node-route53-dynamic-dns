@@ -4,7 +4,7 @@ import { CHANGE_INSYNC_INTERVAL_MS, CHANGE_INSYNC_LIMIT_MS } from "../constants/
 import { LogLevel } from "../constants/logging.mjs";
 import { loggerForModuleUrl, logWhenEnabled } from "../environment/logger.mjs";
 import {
-  DnsHostRecordSet,
+  DnsAddressRecordSet,
   DnsZoneRecordClient,
   DnsZoneRecordSets,
 } from "../types/dns-zone-record-client.mjs";
@@ -122,7 +122,7 @@ export class Route53UpdateClient implements DnsZoneRecordClient {
     const dnsRecordSet = new Set(dnsRecords);
     const records = response.ResourceRecordSets.filter(
       rs => rs.Name && dnsRecordSet.has(rs.Name) && (rs.Type === "A" || rs.Type === "AAAA")
-    ) as DnsHostRecordSet[];
+    ) as DnsAddressRecordSet[];
 
     logWhenEnabled(this.logger, LogLevel.debug, () => {
       const recordsString = JSON.stringify(records, null, 2);

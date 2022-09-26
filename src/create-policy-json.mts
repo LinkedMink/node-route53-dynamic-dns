@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import chalk from "chalk";
 import { v4 as uuidV4 } from "uuid";
 import { ConfigKey } from "./constants/config.mjs";
@@ -25,6 +27,10 @@ logger.verbose(`Get accessible DNS zone's for access key ID: ${awsAccessKeyId}`)
 const inputHostnames = config.getJson<string[]>(ConfigKey.HostnamesToUpdate);
 const dnsRecords = inputHostnames.map(validateNormalizeDnsRecord);
 const zoneIds = await route53Client.getZonesForDnsRecords(dnsRecords);
+
+if (zoneIds.size <= 0) {
+  throw new Error(`No zones were found matching the input record: ${dnsRecords.toString()}`);
+}
 
 logger.verbose(
   `Found zone ID's matching hostnames: ${JSON.stringify(Array.from(zoneIds), null, 2)}`

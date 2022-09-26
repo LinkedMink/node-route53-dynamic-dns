@@ -1,10 +1,10 @@
 import type { ResourceRecordSet } from "@aws-sdk/client-route-53";
 
-export type DnsHostRecordType = "A" | "AAAA";
+export type DnsAddressRecordType = "A" | "AAAA";
 
-export interface DnsHostRecordSet extends ResourceRecordSet {
+export interface DnsAddressRecordSet extends ResourceRecordSet {
   Name: string;
-  Type: DnsHostRecordType;
+  Type: DnsAddressRecordType;
   ResourceRecords: {
     Value: string;
   }[];
@@ -12,7 +12,7 @@ export interface DnsHostRecordSet extends ResourceRecordSet {
 
 export interface DnsZoneRecordSets {
   zoneId: string;
-  records: DnsHostRecordSet[];
+  records: DnsAddressRecordSet[];
 }
 
 export interface DnsZoneRecordClient {

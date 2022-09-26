@@ -1,33 +1,19 @@
-import EventEmitter from "events";
-import { HostRecordsRetrievedEvent, HostRecordsUpdatedEvent } from "../constants/events.mjs";
 import { loggerForModuleUrl } from "../environment/logger.mjs";
-import { DnsZoneRecordClient, DnsZoneRecordSets } from "../types/dns-zone-record-client.mjs";
-import { HostRecordEventEmitter, HostRecordState } from "../types/host-record-events.mjs";
+import { DnsRecordSetSource } from "../types/dns-record-events.mjs";
+import { DnsZoneRecordClient } from "../types/dns-zone-record-client.mjs";
 import { IpAddresses, PublicIpState } from "../types/public-ip-events.mjs";
 
-export class Route53HostRecordUpdater extends EventEmitter implements HostRecordEventEmitter {
+export class Route53AddressRecordUpdater {
   private readonly logger = loggerForModuleUrl(import.meta.url);
 
   private lastIpUpdated: IpAddresses | null = null;
-  private zoneRecordSets: DnsZoneRecordSets[] = [];
   private pendingUpdate: Promise<void> | null = null;
   private eventDuringUpdate: PublicIpState | null = null;
 
-  constructor(private readonly client: DnsZoneRecordClient) {
-    super();
-  }
-
-  /**
-   * Get the initial state of the zones and DNS records to cache their IP and IDs for quicker lookups
-   * @param dnsRecordsToUpdate Search all zones and records the AWS account has access for hostnames that match
-   * @returns Resolve when matching zones and host records have been cached
-   */
-  initialize = async (dnsRecordsToUpdate: string[]): Promise<void> => {
-    this.zoneRecordSets = await this.client.getZoneRecords(dnsRecordsToUpdate);
-
-    this.logger.verbose(`Initialized with zones: ${this.zoneRecordSets.length}`);
-    this.emit(HostRecordsRetrievedEvent, this.getHostRecordState());
-  };
+  constructor(
+    private readonly client: DnsZoneRecordClient,
+    private readonly recordSource: DnsRecordSetSource
+  ) {}
 
   /**
    * When the public IP changes, check if any host records have an out of date ip. If they do, start an update for each out of
@@ -38,7 +24,7 @@ export class Route53HostRecordUpdater extends EventEmitter implements HostRecord
    * only want to use the latest IP to make the public IP update independent of the host record update without queuing events that
    * won't be relevant anymore.
    */
-  handlePublicIpUpdate = async (event: PublicIpState): Promise<void> => {
+  handlePublicIpUpdate = (event: PublicIpState): void => {
     if (this.pendingUpdate) {
       this.logger.debug("Pending update in progress, defer update until finished");
       this.eventDuringUpdate = event;
@@ -46,14 +32,6 @@ export class Route53HostRecordUpdater extends EventEmitter implements HostRecord
     }
 
     this.pendingUpdate = this.updateRecordsIfOutdated(event.publicIpAddresses);
-    await this.pendingUpdate;
-    this.pendingUpdate = null;
-
-    if (this.eventDuringUpdate) {
-      const eventPending = this.eventDuringUpdate;
-      this.eventDuringUpdate = null;
-      void this.handlePublicIpUpdate(eventPending);
-    }
   };
 
   private updateRecordsIfOutdated = async (publicIp: IpAddresses): Promise<void> => {
@@ -62,7 +40,8 @@ export class Route53HostRecordUpdater extends EventEmitter implements HostRecord
       return;
     }
 
-    const toUpdateZoneRecords = this.zoneRecordSets
+    const currentRecordSets = await this.recordSource.getRecords();
+    const updateZoneRecords = currentRecordSets
       .filter(z =>
         z.records.some(
           s =>
@@ -102,7 +81,7 @@ export class Route53HostRecordUpdater extends EventEmitter implements HostRecord
         }),
       }));
 
-    if (toUpdateZoneRecords.length <= 0) {
+    if (updateZoneRecords.length <= 0) {
       this.logger.verbose(
         `No outdated records, no update applied for IPs: v4=${publicIp.v4}, v6=${publicIp.v6}`
       );
@@ -111,38 +90,19 @@ export class Route53HostRecordUpdater extends EventEmitter implements HostRecord
     }
 
     this.logger.info(
-      `Starting update for each outdated zone: zones=${toUpdateZoneRecords.length}, v4=${publicIp.v4}, v6=${publicIp.v6}`
+      `Starting update for each outdated zone: zones=${updateZoneRecords.length}, v4=${publicIp.v4}, v6=${publicIp.v6}`
     );
-    const statusMap = await this.client.updateZoneRecords(toUpdateZoneRecords);
+    const statusMap = await this.client.updateZoneRecords(updateZoneRecords);
 
-    this.zoneRecordSets = this.zoneRecordSets.map(z => {
-      const hasSucceeded = statusMap.get(z.zoneId);
-      if (hasSucceeded) {
-        const updated = toUpdateZoneRecords.find(u => u.zoneId === z.zoneId);
-        if (updated) {
-          return { ...updated };
-        }
-      }
-
-      return { ...z };
-    });
+    this.recordSource.updateRecordsAfterSync(updateZoneRecords, statusMap);
 
     this.lastIpUpdated = publicIp;
-    this.emit(HostRecordsUpdatedEvent, this.getHostRecordState());
-  };
 
-  private getHostRecordState = (): HostRecordState => {
-    const hostRecords = this.zoneRecordSets.flatMap(z =>
-      z.records.map(r => ({
-        name: r.Name,
-        type: r.Type,
-        value: r.ResourceRecords[0].Value,
-      }))
-    );
-
-    return {
-      hostRecords,
-      lastUpdateDateTime: new Date(),
-    };
+    this.pendingUpdate = null;
+    if (this.eventDuringUpdate) {
+      const eventPending = this.eventDuringUpdate;
+      this.eventDuringUpdate = null;
+      void this.handlePublicIpUpdate(eventPending);
+    }
   };
 }

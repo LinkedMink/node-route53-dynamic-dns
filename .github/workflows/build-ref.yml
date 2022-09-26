@@ -11,6 +11,6 @@ on:
 
 jobs:
   build:
-    uses: LinkedMink/node-route53-dynamic-dns/.github/workflows/build.yml@main
+    uses: LinkedMink/shared-scripts/.github/workflows/build-npm-package.yml@main
     with:
       uploadBuild: false

@@ -1,4 +1,8 @@
-export const PublicIpCheckedEvent = "publicIpChecked";
+export enum PublicIpEvent {
+  Retrieved = "publicIpRetrieved",
+}
 
-export const HostRecordsRetrievedEvent = "hostRecordRetrieved";
-export const HostRecordsUpdatedEvent = "hostRecordUpdated";
+export enum DnsRecordsEvent {
+  Retrieved = "dnsRecordRetrieved",
+  Updated = "dnsRecordUpdated",
+}

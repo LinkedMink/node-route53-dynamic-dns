@@ -1,5 +1,5 @@
 import type EventEmitter from "events";
-import type { PublicIpCheckedEvent } from "../constants/events.mjs";
+import type { PublicIpEvent } from "../constants/events.mjs";
 
 export interface IpAddresses {
   v4: string | null;
@@ -15,5 +15,5 @@ export type PublicIpEventHandler = (event: PublicIpState) => void;
 
 export interface PublicIpEventEmitter extends EventEmitter {
   start(): Promise<void>;
-  on(eventName: typeof PublicIpCheckedEvent, listener: PublicIpEventHandler): this;
+  on(eventName: PublicIpEvent, listener: PublicIpEventHandler): this;
 }

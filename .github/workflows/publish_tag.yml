@@ -16,7 +16,7 @@ jobs:
   publish:
     if: github.ref == 'refs/heads/main'
     needs: build
-    uses: LinkedMink/node-route53-dynamic-dns/.github/workflows/publish.yml@main
+    uses: LinkedMink/shared-scripts/.github/workflows/publish-artifacts-for-tag.yml@main
     with:
       uploadToTag: ${{ github.ref_name }}
       uploadedBuildName: ${{ needs.build.outputs.uploadedBuildName }} 

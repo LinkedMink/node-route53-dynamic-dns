@@ -2,7 +2,7 @@ import EventEmitter from "events";
 import { IpNotFoundError, publicIpv4, publicIpv6 } from "public-ip";
 import { setInterval } from "timers/promises";
 import { MINIMUM_IP_UPDATE_INTERVAL_MS } from "../constants/behavior.mjs";
-import { PublicIpCheckedEvent } from "../constants/events.mjs";
+import { PublicIpEvent } from "../constants/events.mjs";
 import { loggerForModuleUrl } from "../environment/logger.mjs";
 import { formatError } from "../functions/format.mjs";
 import { PublicIpEventEmitter, PublicIpState } from "../types/public-ip-events.mjs";
@@ -10,7 +10,7 @@ import { PublicIpEventEmitter, PublicIpState } from "../types/public-ip-events.m
 export class PublicIpClient extends EventEmitter implements PublicIpEventEmitter {
   private readonly logger = loggerForModuleUrl(import.meta.url);
 
-  constructor(readonly updateIntervalMs: number) {
+  constructor(readonly updateIntervalMs: number, readonly isIpV6Enabled = true) {
     super();
     if (this.updateIntervalMs < MINIMUM_IP_UPDATE_INTERVAL_MS) {
       throw new Error(`updateIntervalMs must be at least: ${MINIMUM_IP_UPDATE_INTERVAL_MS}ms`);
@@ -38,7 +38,7 @@ export class PublicIpClient extends EventEmitter implements PublicIpEventEmitter
 
     this.logger.info(`Emitting public IPs to check: v4=${ipV4}, v6=${ipV6}`);
 
-    this.emit(PublicIpCheckedEvent, state);
+    this.emit(PublicIpEvent.Retrieved, state);
     return state;
   };
 
@@ -52,6 +52,10 @@ export class PublicIpClient extends EventEmitter implements PublicIpEventEmitter
   };
 
   private getPublicIpV6 = async (): Promise<string | null> => {
+    if (!this.isIpV6Enabled) {
+      return null;
+    }
+
     try {
       return await publicIpv6();
     } catch (error: unknown) {
