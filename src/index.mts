@@ -29,7 +29,7 @@ const route53Client: DnsZoneRecordClient = new Route53UpdateClient(
 
 const route53Updater: HostRecordEventEmitter = new Route53HostRecordUpdater(route53Client);
 
-const ipUpdateInterval = config.getNumber(ConfigKey.CheckIntervalSeconds) * 1000;
+const ipUpdateInterval = config.getNumber(ConfigKey.IpCheckIntervalSeconds) * 1000;
 const publicIpClient: PublicIpEventEmitter = new PublicIpClient(ipUpdateInterval);
 publicIpClient.on(PublicIpCheckedEvent, route53Updater.handlePublicIpUpdate);
 

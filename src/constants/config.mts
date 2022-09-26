@@ -6,7 +6,7 @@ export enum ConfigKey {
   BindHost = "BIND_HOST",
   BindPort = "BIND_PORT",
 
-  CheckIntervalSeconds = "CHECK_INTERVAL_SECONDS",
+  IpCheckIntervalSeconds = "IP_CHECK_INTERVAL_SECONDS",
 
   HostnamesToUpdate = "HOSTNAMES_TO_UPDATE",
 
@@ -21,7 +21,7 @@ export const configDefaultMap: Map<ConfigKey, string> = new Map([
 
   [ConfigKey.BindPort, String(61080)],
 
-  [ConfigKey.CheckIntervalSeconds, String(15 * 60)],
+  [ConfigKey.IpCheckIntervalSeconds, String(15 * 60)],
 ]);
 
 export enum NodeEnv {

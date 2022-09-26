@@ -9,13 +9,15 @@ import {
   DnsZoneRecordSets,
 } from "../types/dns-zone-record-client.mjs";
 
+const NO_REGION = "REGION";
+
 export class Route53UpdateClient implements DnsZoneRecordClient {
   private readonly logger = loggerForModuleUrl(import.meta.url);
   private readonly client: Route53;
 
   constructor(awsAccessKeyId: string, awsAccessKeySecret: string) {
     this.client = new Route53({
-      region: "REGION",
+      region: NO_REGION,
       credentials: {
         accessKeyId: awsAccessKeyId,
         secretAccessKey: awsAccessKeySecret,
@@ -161,7 +163,11 @@ export class Route53UpdateClient implements DnsZoneRecordClient {
       this.logger,
       LogLevel.debug,
       () =>
-        `Records updated for zone: changeId=${changeId}, ${JSON.stringify(zoneRecords, null, 2)}`
+        `Records updates for zone pending: changeId=${changeId}, ${JSON.stringify(
+          zoneRecords,
+          null,
+          2
+        )}`
     );
 
     const hasSucceeded = await this.getChangeStatusUntilInSync(
@@ -190,6 +196,8 @@ export class Route53UpdateClient implements DnsZoneRecordClient {
     }
 
     await setTimeout(CHANGE_INSYNC_INTERVAL_MS);
+
+    this.logger.debug(`getChange request for ID: ${changeId}`);
     const response = await this.client.getChange({ Id: changeId });
 
     return this.getChangeStatusUntilInSync(changeId, response.ChangeInfo?.Status, startTime);
