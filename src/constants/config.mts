@@ -18,12 +18,12 @@ export enum ConfigKey {
 
 export const configDefaultMap: Map<ConfigKey, string> = new Map([
   [ConfigKey.AppName, "@linkedmink/node-route53-dynamic-dns"],
-  [ConfigKey.LogFile, "combined.log"],
+  [ConfigKey.LogFile, "node-route53-dynamic-dns.log"],
   [ConfigKey.LogLevel, "info"],
 
   [ConfigKey.BindPort, String(61080)],
 
-  [ConfigKey.IpCheckIntervalSeconds, String(15 * 60)],
+  [ConfigKey.IpCheckIntervalSeconds, String(5 * 60)],
   [ConfigKey.IpV6Enabled, String(true)],
   [ConfigKey.CacheDnsRecords, String(true)],
 ]);

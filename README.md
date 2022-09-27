@@ -70,3 +70,22 @@ npm run start:built
 ```
 
 ### Build
+
+#### Publish NPM
+
+```sh
+# Manual Dev Build Publish
+npm --no-git-tag-version version prerelease
+npm publish
+```
+
+#### Docker Image
+
+There's a [Dockerfile](docker/Dockerfile) that can be used to build a Docker image. Create a multi-architechture docker image and push it
+to a registry with the included [build script](docker/build.sh).
+
+```sh
+docker/build.sh
+# Tag and push to a specific registry and scope
+DOCKER_REGISTRY=myregistry.tld DOCKER_SCOPE=myscope docker/build.sh
+```

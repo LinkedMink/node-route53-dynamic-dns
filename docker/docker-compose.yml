@@ -1,0 +1,20 @@
+---
+services:
+  prometheus:
+    image: linkedmink/node-route53-dynamic-dns:latest
+    # ports:
+    #   - 61080:61080
+    restart: always
+    environment:
+      - LOG_LEVEL=verbose
+      - BIND_PORT=
+      - IP_V6_ENABLED=false
+      - HOSTNAMES_TO_UPDATE=["myhost.public.tld"]
+      - AWS_ACCESS_KEY_ID=
+      - AWS_ACCESS_KEY_SECRET=
+
+networks:
+  default:
+    name: node-route53-dynamic-dns-bridge
+    # sudo docker network create node-route53-dynamic-dns-bridge
+    # external: true

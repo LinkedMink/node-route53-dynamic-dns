@@ -1,7 +1,9 @@
 name: Publish Tag
+
 concurrency: 
   group: publish
   cancel-in-progress: true
+
 on:
   push:
     tags:

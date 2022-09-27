@@ -119,7 +119,7 @@ export class EnvironmentConfig {
     const configValue =
       typeof process.env[key] === "string" ? process.env[key] : configDefaultMap.get(key);
 
-    if (typeof configValue === "string") {
+    if (configValue) {
       return configValue;
     }
 

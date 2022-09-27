@@ -4,12 +4,20 @@ IMAGE_NAME="node-route53-dynamic-dns"
 ARCHITECTURES="linux/amd64,linux/arm64"
 DOCKER_ARGS=""
 
+if [ -z "$DOCKER_REGISTRY" ]; then
+  DOCKER_REGISTRY="" 
+fi
+if [[ "$DOCKER_REGISTRY" != "*/" ]]
+then
+  DOCKER_REGISTRY="${DOCKER_REGISTRY}/"
+fi
+
 if [ -z "$DOCKER_SCOPE" ]; then
   DOCKER_SCOPE="linkedmink/" 
 fi
-
-if [ -z "$DOCKER_REGISTRY" ]; then
-  DOCKER_REGISTRY="" 
+if [[ "$DOCKER_SCOPE" != "*/" ]]
+then
+  DOCKER_SCOPE="${DOCKER_SCOPE}/"
 fi
 
 startTime=$(date +"%s")

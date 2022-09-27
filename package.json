@@ -20,11 +20,15 @@
     "type": "git",
     "url": "https://github.com/LinkedMink/node-route53-dynamic-dns.git"
   },
+  "engines": {
+    "node": ">=16"
+  },
   "scripts": {
     "start": "ts-node --esm --project src/tsconfig.json --transpile-only --require dotenv/config src/index.mts",
     "start:built": "node --enable-source-maps -r dotenv/config build/index.mjs",
     "script:create-policy-json": "ts-node --esm --project src/tsconfig.json --transpile-only --require dotenv/config src/create-policy-json.mts",
     "build": "rimraf build && tsc --project src/tsconfig.json",
+    "prepack": "npm run build",
     "test": "jest --watchAll",
     "test:ci": "jest --coverage --ci",
     "test:debug": "jest --cache=false --detectOpenHandles --runInBand --watchAll",
