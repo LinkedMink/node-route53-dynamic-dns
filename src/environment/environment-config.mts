@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import fs from "fs";
+import fs from "fs/promises";
 import { PackageJson } from "type-fest";
 import {
   configDefaultMap,
@@ -8,64 +8,58 @@ import {
   NodeEnv,
 } from "../constants/config.mjs";
 
+/**
+ * Cache shared app configuration from files in memory
+ */
 export class EnvironmentConfig {
   private readonly fileBuffers = new Map<ConfigKey, Buffer>();
   private readonly jsonData = new Map<ConfigKey, unknown>();
-  private readonly packageJsonValue: PackageJson;
-  private readonly environment = process.env.NODE_ENV?.toLowerCase() ?? NodeEnv.Local;
+  private readonly environment: NodeEnv;
 
   constructor() {
+    dotenv.config({ override: true });
+    this.environment = (process.env.NODE_ENV?.toLowerCase() ?? NodeEnv.Production) as NodeEnv;
     const dotEnvFile = `.env.${this.environment}`;
-    if (fs.existsSync(dotEnvFile)) {
-      dotenv.config({ path: dotEnvFile });
-    }
-
-    const filePath = "./package.json";
-    const data = fs.readFileSync(filePath, "utf8");
-    this.packageJsonValue = JSON.parse(data) as PackageJson;
+    dotenv.config({ path: dotEnvFile, override: true });
   }
 
-  public get isEnvironmentLocal(): boolean {
+  get isEnvironmentLocal(): boolean {
     return this.environment === NodeEnv.Local;
   }
 
-  public get isEnvironmentProd(): boolean {
+  get isEnvironmentProd(): boolean {
     return this.environment === NodeEnv.Production;
   }
 
-  public get isEnvironmentContainerized(): boolean {
+  get isEnvironmentContainerized(): boolean {
     return process.env[IS_CONTAINERIZED_ENV_VAR]?.trim().toLowerCase() === "true";
   }
 
-  public get packageJson(): PackageJson {
-    return this.packageJsonValue;
-  }
-
-  public getString = (key: ConfigKey): string => {
+  getString = (key: ConfigKey): string => {
     return this.getConfigValue(key);
   };
 
-  public getStringOrNull = (key: ConfigKey): string | null => {
+  getStringOrNull = (key: ConfigKey): string | null => {
     return this.getConfigValueOrNull(key);
   };
 
-  public getNumber = (key: ConfigKey): number => {
+  getNumber = (key: ConfigKey): number => {
     const value = this.getConfigValue(key);
     return Number(value);
   };
 
-  public getNumberOrNull = (key: ConfigKey): number | null => {
+  getNumberOrNull = (key: ConfigKey): number | null => {
     const value = this.getConfigValueOrNull(key);
     return value !== null ? Number(value) : null;
   };
 
-  public getBool = (key: ConfigKey): boolean => {
+  getBool = (key: ConfigKey): boolean => {
     const value = this.getConfigValue(key);
     return value.trim().toLowerCase() === "true";
   };
 
   // prettier-ignore
-  public getJsonOrString = <T,>(
+  getJsonOrString = <T,>(
     key: ConfigKey
   ): string | T => {
     const json = this.jsonData.get(key);
@@ -82,7 +76,7 @@ export class EnvironmentConfig {
   };
 
   // prettier-ignore
-  public getJson = <T,>(key: ConfigKey): T => {
+  getJson = <T,>(key: ConfigKey): T => {
     const json = this.jsonData.get(key);
     if (json) {
       return json as T;
@@ -94,14 +88,14 @@ export class EnvironmentConfig {
     return parsed;
   };
 
-  public getFileBuffer = (key: ConfigKey): Buffer => {
+  getFileBuffer = async (key: ConfigKey): Promise<Buffer> => {
     const buffer = this.fileBuffers.get(key);
     if (buffer) {
       return buffer;
     }
 
     const filePath = this.getConfigValue(key);
-    const data = fs.readFileSync(filePath);
+    const data = await fs.readFile(filePath);
     this.fileBuffers.set(key, data);
     return data;
   };

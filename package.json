@@ -1,6 +1,6 @@
 {
   "name": "@linkedmink/node-route53-dynamic-dns",
-  "version": "1.0.0-0",
+  "version": "1.0.0-3",
   "description": "Background process that updates AWS Route 53 DNS address records whenever the public IP of the hosting environment changes",
   "keywords": [
     "AWS",
@@ -24,9 +24,10 @@
     "node": ">=16"
   },
   "scripts": {
-    "start": "ts-node --esm --project src/tsconfig.json --transpile-only --require dotenv/config src/index.mts",
-    "start:built": "node --enable-source-maps -r dotenv/config build/index.mjs",
-    "script:create-policy-json": "ts-node --esm --project src/tsconfig.json --transpile-only --require dotenv/config src/create-policy-json.mts",
+    "start": "ts-node --esm --project src/tsconfig.json --transpile-only src/index.mts",
+    "start:built": "node --enable-source-maps build/index.mjs",
+    "cmd:iam-policy": "ts-node --esm --project src/tsconfig.json --transpile-only src/index.mts iam-policy",
+    "prebuild": "node write-package-constants.mjs",
     "build": "rimraf build && tsc --project src/tsconfig.json",
     "prepack": "npm run build",
     "test": "jest --watchAll",
@@ -37,12 +38,12 @@
     "doc": "typedoc"
   },
   "bin": {
-    "node-route53-dynamic-dns": "./build/index.mjs",
-    "node-route53-create-policy-json": "./build/create-policy-json.mjs"
+    "node-route53-dynamic-dns": "./build/index.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-route-53": "^3.178.0",
     "chalk": "^5.0.1",
+    "commander": "^9.4.0",
     "dotenv": "^16.0.2",
     "public-ip": "^6.0.1",
     "uuid": "^9.0.0",

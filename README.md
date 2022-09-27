@@ -19,7 +19,7 @@ This can be useful for home or small business networks where an ISP doesn't issu
 - NodeJS 16
 - Hosted Zones with AWS Route 53
 
-### Service
+### Background Service
 
 You can run the package as a self-contained executable background process and configure your system to run it in the backgound.
 
@@ -36,7 +36,7 @@ you can run the bundled script to geneate a restrictive access policy for the sp
 `AWS_ACCESS_KEY_ID`, `AWS_ACCESS_KEY_SECRET` to a user with access, and change the target records in `HOSTNAMES_TO_UPDATE`.
 
 ```sh
-npm run script:create-policy-json
+npx node-route53-dynamic-dns iam-policy
 ```
 
 After the configuration has been set, execute the packages main function.
@@ -62,7 +62,7 @@ Description=NodeJS client to update AWS Route53 DNS records from the host's publ
 # Environment=AWS_ACCESS_KEY_ID=
 # Environment=AWS_ACCESS_KEY_SECRET=
 # Or use systemd EnvironmentFile
-# EnvironmentFile=/path/to/env.txt
+# EnvironmentFile=/path/to/envFile
 
 ExecStart=/usr/bin/env npx node-route53-dynamic-dns
 

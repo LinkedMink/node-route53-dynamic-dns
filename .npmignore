@@ -17,3 +17,4 @@ jest*
 *.log
 template.env
 typedoc.json
+write-package-constants.mjs

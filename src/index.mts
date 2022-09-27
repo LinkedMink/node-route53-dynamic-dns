@@ -1,60 +1,15 @@
 #!/usr/bin/env node
 
-import { ConfigKey } from "./constants/config.mjs";
-import { DnsRecordsEvent, PublicIpEvent } from "./constants/events.mjs";
+import { Command } from "commander";
+import iamPolicyCommand from "./commands/iam-policy.mjs";
+import serviceCommand from "./commands/service.mjs";
+import { PACKAGE_UNSCOPED_NAME } from "./constants/version.mjs";
 import { EnvironmentConfig } from "./environment/environment-config.mjs";
-import { initializeLogging } from "./environment/logger.mjs";
-import { HealthCheckServer } from "./event-handlers/health-check-server.mjs";
-import { PublicIpClient } from "./event-handlers/public-ip-event-emitter.mjs";
-import { Route53AddressRecordUpdater } from "./event-handlers/route53-address-record-updater.mjs";
-import { createDnsRecordSetSource } from "./services/dns-record-set-source.mjs";
-import { Route53UpdateClient } from "./services/route53-update-client.mjs";
-import { DnsZoneRecordClient } from "./types/dns-zone-record-client.mjs";
-import { PublicIpEventEmitter } from "./types/public-ip-events.mjs";
 
 const config = new EnvironmentConfig();
-const logger = initializeLogging(config);
 
-logger.verbose("Initializing Main");
+const program = new Command(PACKAGE_UNSCOPED_NAME)
+  .addCommand(serviceCommand(config), { isDefault: true })
+  .addCommand(iamPolicyCommand(config));
 
-const awsAccessKeyId = config.getString(ConfigKey.AwsAccessKeyId);
-const awsAccessKeySecret = config.getString(ConfigKey.AwsAccessKeySecret);
-const route53Client: DnsZoneRecordClient = new Route53UpdateClient(
-  awsAccessKeyId,
-  awsAccessKeySecret
-);
-
-const inputHostnames = config.getJson<string[]>(ConfigKey.HostnamesToUpdate);
-const isCachedRecordsEnabled = config.getBool(ConfigKey.CacheDnsRecords);
-const dnsRecordSetSource = createDnsRecordSetSource(
-  route53Client,
-  isCachedRecordsEnabled,
-  inputHostnames
-);
-
-const route53Updater = new Route53AddressRecordUpdater(route53Client, dnsRecordSetSource);
-
-const ipUpdateInterval = config.getNumber(ConfigKey.IpCheckIntervalSeconds) * 1000;
-const ipUpdateTimeout = config.getNumber(ConfigKey.IpCheckTimeoutMs);
-const isIpV6Enabled = config.getBool(ConfigKey.IpV6Enabled);
-const publicIpClient: PublicIpEventEmitter = new PublicIpClient(
-  ipUpdateInterval,
-  ipUpdateTimeout,
-  isIpV6Enabled
-);
-publicIpClient.on(PublicIpEvent.Retrieved, route53Updater.handlePublicIpUpdate);
-
-const port = config.getNumberOrNull(ConfigKey.BindPort);
-if (port !== null) {
-  const healthCheckServer = new HealthCheckServer();
-  dnsRecordSetSource.on(DnsRecordsEvent.Retrieved, healthCheckServer.handleHostRecordsEvent);
-  dnsRecordSetSource.on(DnsRecordsEvent.Updated, healthCheckServer.handleHostRecordsEvent);
-  publicIpClient.on(PublicIpEvent.Retrieved, healthCheckServer.handlePublicIpEvent);
-
-  const host = config.getStringOrNull(ConfigKey.BindHost);
-  await healthCheckServer.start(port, host !== null ? host : undefined);
-}
-
-void publicIpClient.start();
-
-logger.verbose("Initialized Main");
+await program.parseAsync();

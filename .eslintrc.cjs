@@ -7,7 +7,7 @@ const config = {
     node: true,
     es2021: true,
   },
-  ignorePatterns: ["build/**", "coverage/**"],
+  ignorePatterns: ["build/**", "coverage/**", "write-package-constants.mjs"],
   overrides: [
     {
       files: ["src/**/*.{m,c,}ts"],
