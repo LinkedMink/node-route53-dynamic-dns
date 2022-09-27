@@ -26,7 +26,7 @@ const route53Client: DnsZoneRecordClient = new Route53UpdateClient(
 
 const inputHostnames = config.getJson<string[]>(ConfigKey.HostnamesToUpdate);
 const isCachedRecordsEnabled = config.getBool(ConfigKey.CacheDnsRecords);
-const dnsRecordSetSource = await createDnsRecordSetSource(
+const dnsRecordSetSource = createDnsRecordSetSource(
   route53Client,
   isCachedRecordsEnabled,
   inputHostnames
@@ -35,7 +35,13 @@ const dnsRecordSetSource = await createDnsRecordSetSource(
 const route53Updater = new Route53AddressRecordUpdater(route53Client, dnsRecordSetSource);
 
 const ipUpdateInterval = config.getNumber(ConfigKey.IpCheckIntervalSeconds) * 1000;
-const publicIpClient: PublicIpEventEmitter = new PublicIpClient(ipUpdateInterval);
+const ipUpdateTimeout = config.getNumber(ConfigKey.IpCheckTimeoutMs);
+const isIpV6Enabled = config.getBool(ConfigKey.IpV6Enabled);
+const publicIpClient: PublicIpEventEmitter = new PublicIpClient(
+  ipUpdateInterval,
+  ipUpdateTimeout,
+  isIpV6Enabled
+);
 publicIpClient.on(PublicIpEvent.Retrieved, route53Updater.handlePublicIpUpdate);
 
 const port = config.getNumberOrNull(ConfigKey.BindPort);

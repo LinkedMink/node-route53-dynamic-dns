@@ -1,7 +1,10 @@
 import EventEmitter from "events";
 import { IpNotFoundError, publicIpv4, publicIpv6 } from "public-ip";
 import { setInterval } from "timers/promises";
-import { MINIMUM_IP_UPDATE_INTERVAL_MS } from "../constants/behavior.mjs";
+import {
+  MINIMUM_IP_RETRIEVE_TIMEOUT_MS,
+  MINIMUM_IP_RETRIEVE_UPDATE_DIFF_MS,
+} from "../constants/behavior.mjs";
 import { PublicIpEvent } from "../constants/events.mjs";
 import { loggerForModuleUrl } from "../environment/logger.mjs";
 import { formatError } from "../functions/format.mjs";
@@ -10,10 +13,23 @@ import { PublicIpEventEmitter, PublicIpState } from "../types/public-ip-events.m
 export class PublicIpClient extends EventEmitter implements PublicIpEventEmitter {
   private readonly logger = loggerForModuleUrl(import.meta.url);
 
-  constructor(readonly updateIntervalMs: number, readonly isIpV6Enabled = true) {
+  constructor(
+    readonly updateIntervalMs: number,
+    readonly ipRetrieveTimeout: number,
+    readonly isIpV6Enabled: boolean
+  ) {
     super();
-    if (this.updateIntervalMs < MINIMUM_IP_UPDATE_INTERVAL_MS) {
-      throw new Error(`updateIntervalMs must be at least: ${MINIMUM_IP_UPDATE_INTERVAL_MS}ms`);
+    if (this.ipRetrieveTimeout < MINIMUM_IP_RETRIEVE_TIMEOUT_MS) {
+      throw new Error(`ipRetrieveTimeout must be at least: ${MINIMUM_IP_RETRIEVE_TIMEOUT_MS}ms`);
+    }
+
+    // Don't allow getting the IP again while a retrieval is possibly in progress
+    const updateIntervalMinimumMs =
+      MINIMUM_IP_RETRIEVE_TIMEOUT_MS + MINIMUM_IP_RETRIEVE_UPDATE_DIFF_MS;
+    if (this.updateIntervalMs < updateIntervalMinimumMs) {
+      throw new Error(
+        `updateIntervalMs must be at least: ${MINIMUM_IP_RETRIEVE_UPDATE_DIFF_MS}ms more than ipRetrieveTimeout(${MINIMUM_IP_RETRIEVE_TIMEOUT_MS}ms)`
+      );
     }
   }
 
@@ -44,7 +60,7 @@ export class PublicIpClient extends EventEmitter implements PublicIpEventEmitter
 
   private getPublicIpV4 = async (): Promise<string | null> => {
     try {
-      return await publicIpv4();
+      return await publicIpv4({ timeout: this.ipRetrieveTimeout });
     } catch (error: unknown) {
       this.logIpError(error, "V4");
       return null;
@@ -57,7 +73,7 @@ export class PublicIpClient extends EventEmitter implements PublicIpEventEmitter
     }
 
     try {
-      return await publicIpv6();
+      return await publicIpv6({ timeout: this.ipRetrieveTimeout });
     } catch (error: unknown) {
       this.logIpError(error, "V6");
       return null;

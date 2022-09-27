@@ -32,6 +32,13 @@ export class Route53AddressRecordUpdater {
     }
 
     this.pendingUpdate = this.updateRecordsIfOutdated(event.publicIpAddresses);
+
+    this.pendingUpdate = null;
+    if (this.eventDuringUpdate) {
+      const eventPending = this.eventDuringUpdate;
+      this.eventDuringUpdate = null;
+      void this.handlePublicIpUpdate(eventPending);
+    }
   };
 
   private updateRecordsIfOutdated = async (publicIp: IpAddresses): Promise<void> => {
@@ -97,12 +104,5 @@ export class Route53AddressRecordUpdater {
     this.recordSource.updateRecordsAfterSync(updateZoneRecords, statusMap);
 
     this.lastIpUpdated = publicIp;
-
-    this.pendingUpdate = null;
-    if (this.eventDuringUpdate) {
-      const eventPending = this.eventDuringUpdate;
-      this.eventDuringUpdate = null;
-      void this.handlePublicIpUpdate(eventPending);
-    }
   };
 }

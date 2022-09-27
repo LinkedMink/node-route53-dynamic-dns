@@ -7,6 +7,7 @@ export enum ConfigKey {
   BindPort = "BIND_PORT",
 
   IpCheckIntervalSeconds = "IP_CHECK_INTERVAL_SECONDS",
+  IpCheckTimeoutMs = "IP_CHECK_TIMEOUT_MS",
   IpV6Enabled = "IP_V6_ENABLED",
   CacheDnsRecords = "CACHE_DNS_RECORDS",
 

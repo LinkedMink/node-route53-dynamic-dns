@@ -3,6 +3,6 @@ export enum PublicIpEvent {
 }
 
 export enum DnsRecordsEvent {
-  Retrieved = "dnsRecordRetrieved",
-  Updated = "dnsRecordUpdated",
+  Retrieved = "dnsRecordsRetrieved",
+  Updated = "dnsRecordsUpdated",
 }

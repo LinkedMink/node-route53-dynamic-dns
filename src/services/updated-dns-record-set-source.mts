@@ -9,6 +9,7 @@ export class UpdatedDnsRecordSetStore extends EventEmitter implements DnsRecordS
   private readonly logger = loggerForModuleUrl(import.meta.url);
 
   private zoneRecordSets: DnsZoneRecordSets[] = [];
+  private hasRetrievedFirstRecordSets = false;
 
   constructor(
     private readonly client: DnsZoneRecordClient,
@@ -20,11 +21,18 @@ export class UpdatedDnsRecordSetStore extends EventEmitter implements DnsRecordS
   getRecords = async (): Promise<DnsZoneRecordSets[]> => {
     this.zoneRecordSets = await this.client.getZoneRecords(this.dnsRecordsToUpdate);
     if (this.zoneRecordSets.length <= 0) {
-      throw new Error(
-        `No zones were found matching the input record: ${this.dnsRecordsToUpdate.toString()}`
-      );
+      // Only throw an error when this is the first record set since that probably indicates a misconfiguration.
+      // During operations the records may change, and we want to keep the service running to recover on the next update.
+      const message = `No zones were found matching the input record: ${this.dnsRecordsToUpdate.toString()}`;
+      if (!this.hasRetrievedFirstRecordSets) {
+        throw new Error(message);
+      }
+
+      this.logger.error(message);
+      return this.zoneRecordSets;
     }
 
+    this.hasRetrievedFirstRecordSets = true;
     this.emitDnsRecordState(DnsRecordsEvent.Retrieved);
     return this.zoneRecordSets;
   };
@@ -44,7 +52,7 @@ export class UpdatedDnsRecordSetStore extends EventEmitter implements DnsRecordS
 
   private emitDnsRecordState = (event: DnsRecordsEvent) => {
     const dnsRecords = convertToDnsRecordState(this.zoneRecordSets);
-    this.logger.verbose(`${event}: ${this.zoneRecordSets.length}`);
+    this.logger.verbose(`${event}: #zones=${this.zoneRecordSets.length}`);
     this.emit(event, dnsRecords);
   };
 }

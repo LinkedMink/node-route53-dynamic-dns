@@ -3,6 +3,7 @@ import { setTimeout } from "timers/promises";
 import { CHANGE_INSYNC_INTERVAL_MS, CHANGE_INSYNC_LIMIT_MS } from "../constants/behavior.mjs";
 import { LogLevel } from "../constants/logging.mjs";
 import { loggerForModuleUrl, logWhenEnabled } from "../environment/logger.mjs";
+import { formatError } from "../functions/format.mjs";
 import {
   DnsAddressRecordSet,
   DnsZoneRecordClient,
@@ -28,31 +29,43 @@ export class Route53UpdateClient implements DnsZoneRecordClient {
   getZoneRecords = async (dnsRecordsToMatch: string[]): Promise<DnsZoneRecordSets[]> => {
     this.logger.verbose(`Find matching records for DNS records: ${dnsRecordsToMatch.toString()}`);
 
-    const zonesToUpdate = await this.getZonesForDnsRecords(dnsRecordsToMatch);
-    const pendingRequest = Array.from(zonesToUpdate).map(([zoneId, dnsRecords]) => {
-      return this.getRecordsForZone(zoneId, dnsRecords);
-    });
+    try {
+      const zonesToUpdate = await this.getZonesForDnsRecords(dnsRecordsToMatch);
+      const pendingRequest = Array.from(zonesToUpdate).map(([zoneId, dnsRecords]) => {
+        return this.getRecordsForZone(zoneId, dnsRecords);
+      });
 
-    const matchedZoneRecords = await Promise.all(pendingRequest);
+      const matchedZoneRecords = await Promise.all(pendingRequest);
 
-    this.logger.verbose(
-      `Found matching records for DNS records: count=${
-        matchedZoneRecords.length
-      }, host=${dnsRecordsToMatch.toString()}`
-    );
-    logWhenEnabled(
-      this.logger,
-      LogLevel.debug,
-      () => `Zones and records found: ${JSON.stringify(matchedZoneRecords, null, 2)}`
-    );
+      this.logger.verbose(
+        `Found matching records for DNS records: count=${
+          matchedZoneRecords.length
+        }, host=${dnsRecordsToMatch.toString()}`
+      );
+      logWhenEnabled(
+        this.logger,
+        LogLevel.debug,
+        () => `Zones and records found: ${JSON.stringify(matchedZoneRecords, null, 2)}`
+      );
 
-    return matchedZoneRecords;
+      return matchedZoneRecords;
+    } catch (error: unknown) {
+      this.logger.error(formatError(error));
+      return [];
+    }
   };
 
   updateZoneRecords = async (zoneRecords: DnsZoneRecordSets[]): Promise<Map<string, boolean>> => {
     this.logger.verbose(`Update records for zones: ${zoneRecords.length}`);
 
-    const pendingRequest = zoneRecords.map(z => this.updateRecordsForZone(z));
+    const pendingRequest = zoneRecords.map(async z => {
+      try {
+        return await this.updateRecordsForZone(z);
+      } catch (error: unknown) {
+        this.logger.error(formatError(error));
+        return { zoneId: z.zoneId, hasSucceeded: false };
+      }
+    });
     const statuses = await Promise.all(pendingRequest);
 
     logWhenEnabled(

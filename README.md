@@ -27,7 +27,60 @@ You can run the package as a self-contained executable background process and co
 npm install -g @linkedmink/node-route53-dynamic-dns
 ```
 
+The app can be configured using a [.env](https://github.com/motdotla/dotenv#dotenv) file in the current working directory. See the
+[template.env](template.env) for defaults and comments about the allowed options. Alternatively you can use environment variables
+with names matching the keys in `template.env`.
+
+Configure an AWS IAM user with access to the zones and records you wish to update. If you have a user with permissive access (an admin),
+you can run the bundled script to geneate a restrictive access policy for the specific zones and records you want to update. Set
+`AWS_ACCESS_KEY_ID`, `AWS_ACCESS_KEY_SECRET` to a user with access, and change the target records in `HOSTNAMES_TO_UPDATE`.
+
+```sh
+npm run script:create-policy-json
+```
+
+After the configuration has been set, execute the packages main function.
+
+```sh
+npx node-route53-dynamic-dns
+```
+
+#### systemd Example
+
+You can configure the app to run as a detached service at system startup. Here's how you can do it on Linux with systemd
+
+```sh
+cat << HEREDOC > "node-route53-dynamic-dns.service"
+# /etc/systemd/system/node-route53-dynamic-dns.service
+[Unit]
+Description=NodeJS client to update AWS Route53 DNS records from the host's public IP
+
+[Service]
+# WorkingDirectory=/path/to/.env/directory
+# Or configure with environment variables
+# Environment=HOSTNAMES_TO_UPDATE=["myhost.public.tld"]
+# Environment=AWS_ACCESS_KEY_ID=
+# Environment=AWS_ACCESS_KEY_SECRET=
+# Or use systemd EnvironmentFile
+# EnvironmentFile=/path/to/env.txt
+
+ExecStart=/usr/bin/env npx node-route53-dynamic-dns
+
+TimeoutStartSec=0
+
+[Install]
+WantedBy=multi-user.target
+HEREDOC
+
+sudo mv ./node-route53-dynamic-dns.service /etc/systemd/system
+sudo systemctl daemon-reload
+sudo systemctl start node-exporter
+sudo systemctl enable node-exporter
+```
+
 ### Container
+
+You can run the app on any container runtime like Docker and configure it using environment variables. See the example
 
 ## Developing
 
@@ -39,18 +92,10 @@ Install dependencies with NPM.
 npm install
 ```
 
-Configure the app for development with a [.env](template.env) file. Copy the file and edit it as necessary (inline comments for settings).
+Configure the app for development with a .env file. Copy the [template.env](template.env) file and edit it as necessary.
 
 ```sh
 cp template.env .env
-```
-
-Configure an AWS IAM user with access to the zones and records you wish to update. If you have a user with permissive access (an admin),
-you can run the bundled script to geneate a restrictive access policy for the specific zones and records you want to update. Set
-`AWS_ACCESS_KEY_ID`, `AWS_ACCESS_KEY_SECRET` to a user with access, and change the target records in `HOSTNAMES_TO_UPDATE`.
-
-```sh
-npm run script:create-policy-json
 ```
 
 ### Run
@@ -74,8 +119,13 @@ npm run start:built
 #### Publish NPM
 
 ```sh
-# Manual Dev Build Publish
+# Manual Dev Build Publish : premajor | preminor | prepatch | prerelease
 npm --no-git-tag-version version prerelease
+npm publish --tag beta
+
+# Manual Prod Build Publish : major | minor | patch
+npm version patch
+git push origin v1.0.1
 npm publish
 ```
 
