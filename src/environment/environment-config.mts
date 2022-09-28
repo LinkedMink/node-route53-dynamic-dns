@@ -1,6 +1,5 @@
 import dotenv from "dotenv";
 import fs from "fs/promises";
-import { PackageJson } from "type-fest";
 import {
   configDefaultMap,
   ConfigKey,
@@ -16,11 +15,9 @@ export class EnvironmentConfig {
   private readonly jsonData = new Map<ConfigKey, unknown>();
   private readonly environment: NodeEnv;
 
-  constructor() {
-    dotenv.config({ override: true });
+  constructor(dotEnvPath = ".env") {
+    dotenv.config({ path: dotEnvPath, override: true });
     this.environment = (process.env.NODE_ENV?.toLowerCase() ?? NodeEnv.Production) as NodeEnv;
-    const dotEnvFile = `.env.${this.environment}`;
-    dotenv.config({ path: dotEnvFile, override: true });
   }
 
   get isEnvironmentLocal(): boolean {

@@ -6,17 +6,13 @@ DOCKER_ARGS=""
 
 if [ -z "$DOCKER_REGISTRY" ]; then
   DOCKER_REGISTRY="" 
-fi
-if [[ "$DOCKER_REGISTRY" != "*/" ]]
-then
+elif [[ "$DOCKER_REGISTRY" != "*/" ]]; then
   DOCKER_REGISTRY="${DOCKER_REGISTRY}/"
 fi
 
 if [ -z "$DOCKER_SCOPE" ]; then
   DOCKER_SCOPE="linkedmink/" 
-fi
-if [[ "$DOCKER_SCOPE" != "*/" ]]
-then
+elif [[ "$DOCKER_SCOPE" != "*/" ]]; then
   DOCKER_SCOPE="${DOCKER_SCOPE}/"
 fi
 

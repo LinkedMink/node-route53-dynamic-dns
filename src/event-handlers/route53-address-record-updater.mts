@@ -89,17 +89,20 @@ export class Route53AddressRecordUpdater {
       }));
 
     if (updateZoneRecords.length <= 0) {
-      this.logger.verbose(
+      this.logger.info(
         `No outdated records, no update applied for IPs: v4=${publicIp.v4}, v6=${publicIp.v6}`
       );
       this.lastIpUpdated = publicIp;
       return;
     }
 
-    this.logger.info(
+    this.logger.verbose(
       `Starting update for each outdated zone: zones=${updateZoneRecords.length}, v4=${publicIp.v4}, v6=${publicIp.v6}`
     );
     const statusMap = await this.client.updateZoneRecords(updateZoneRecords);
+    this.logger.info(
+      `Updated zone records: zones=${updateZoneRecords.length}, v4=${publicIp.v4}, v6=${publicIp.v6}`
+    );
 
     this.recordSource.updateRecordsAfterSync(updateZoneRecords, statusMap);
 

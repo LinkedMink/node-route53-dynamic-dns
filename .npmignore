@@ -7,7 +7,6 @@ coverage/
 docker/
 docs/
 tests/
-.editorconfig
 .env*
 .eslintrc.cjs
 .lintstagedrc.mjs
@@ -16,5 +15,6 @@ jest*
 *.tgz
 *.log
 template.env
+tsconfig.json
 typedoc.json
 write-package-constants.mjs

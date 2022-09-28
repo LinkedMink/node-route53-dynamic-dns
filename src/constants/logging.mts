@@ -11,5 +11,5 @@ export enum LogLevel {
   silly,
 }
 
-export const DEFAULT_LOGGER_LABEL = "AppGlobal";
+export const DEFAULT_LOGGER_LABEL = "app";
 export const DEFAULT_LOG_LEVEL = LogLevel[LogLevel.info];

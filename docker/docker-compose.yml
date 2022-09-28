@@ -1,17 +1,26 @@
 ---
 services:
-  prometheus:
+  node-route53-dynamic-dns:
     image: linkedmink/node-route53-dynamic-dns:latest
-    # ports:
-    #   - 61080:61080
+    command: [ "npm", "run", "start:built", "--", "--env-file", "/run/secrets/.env.secrets" ]
+    ports:
+      - 61080:61080
     restart: always
     environment:
       - LOG_LEVEL=verbose
-      - BIND_PORT=
+      - BIND_PORT=61080
       - IP_V6_ENABLED=false
       - HOSTNAMES_TO_UPDATE=["myhost.public.tld"]
-      - AWS_ACCESS_KEY_ID=
-      - AWS_ACCESS_KEY_SECRET=
+    secrets:
+      - source: secrets-env
+        target: .env.secrets
+        uid: '1000'
+        gid: '1000'
+        mode: 0400
+
+secrets:
+  secrets-env:
+    file: ./secrets.env
 
 networks:
   default:

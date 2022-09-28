@@ -1,6 +1,7 @@
 # Node Route53 Dynamic DNS
 
-![Build State](https://github.com/LinkedMink/node-route53-dynamic-dns/actions/workflows/build-main.yml/badge.svg)
+[![Build Status](https://github.com/LinkedMink/node-route53-dynamic-dns/actions/workflows/build-main.yml/badge.svg)](https://github.com/LinkedMink/node-route53-dynamic-dns/actions?query=workflow%3A%22build-main%22)
+[![NPM Version](https://img.shields.io/npm/v/@linkedmink/node-route53-dynamic-dns)](https://www.npmjs.com/package/@linkedmink/node-route53-dynamic-dns)
 
 This is a NodeJS background process that updates AWS Route 53 DNS address records whenever the public IP of the hosting environment changes.
 This can be useful for home or small business networks where an ISP doesn't issue a static IP.
@@ -12,16 +13,19 @@ This can be useful for home or small business networks where an ISP doesn't issu
   - Can be used for health checks
   - Outputs current IP and managed records
 
-## Getting Started
-
-### Prerequisite
+## Prerequisites
 
 - NodeJS 16
 - Hosted Zones with AWS Route 53
 
+## Usage
+
+The README will focus on running the app as a user (see [Additional Documentation](#additional-documentation) for build and dev info)
+
 ### Background Service
 
-You can run the package as a self-contained executable background process and configure your system to run it in the backgound.
+You can run the [npm package](https://www.npmjs.com/package/@linkedmink/node-route53-dynamic-dns) as a self-contained executable and
+configure your system to run it in the backgound. Install the package globally.
 
 ```sh
 npm install -g @linkedmink/node-route53-dynamic-dns
@@ -39,7 +43,7 @@ you can run the bundled script to geneate a restrictive access policy for the sp
 npx node-route53-dynamic-dns iam-policy
 ```
 
-After the configuration has been set, execute the packages main function.
+After the configuration has been set, execute the packages main command.
 
 ```sh
 npx node-route53-dynamic-dns
@@ -74,68 +78,32 @@ HEREDOC
 
 sudo mv ./node-route53-dynamic-dns.service /etc/systemd/system
 sudo systemctl daemon-reload
-sudo systemctl start node-exporter
-sudo systemctl enable node-exporter
+sudo systemctl start node-route53-dynamic-dns
+sudo systemctl enable node-route53-dynamic-dns
 ```
 
-### Container
+### Containers
 
-You can run the app on any container runtime like Docker and configure it using environment variables. See the example
-
-## Developing
-
-### Configure
-
-Install dependencies with NPM.
+You can run the app on any container runtime like Docker and configure it using environment variables and/or mounted files. A
+[Docker image](https://hub.docker.com/r/linkedmink/node-route53-dynamic-dns) has been built and published to Docker Hub. An example
+configuration [docker-compose.yml](docker/docker-compose.yml) is included in the repo. It has configuration to mount the
+[secrets.env](docker/secrets.env) as Docker secret. Copy the files and edit them as needed.
 
 ```sh
-npm install
+cp docker/{docker-compose.yml,secrets.env} /my/docker/config/path
+# AWS_ACCESS_KEY_ID, AWS_ACCESS_KEY_SECRET, and HOSTNAMES_TO_UPDATE at minimum
+nano /my/docker/config/path/docker-compose.yml
+nano /my/docker/config/path/secrets.env
+cd /my/docker/config/path
+
+# Test out the configuration
+sudo docker compose up
+# Run the app in the background
+sudo docker compose up -d
 ```
 
-Configure the app for development with a .env file. Copy the [template.env](template.env) file and edit it as necessary.
+## Additional Documentation
 
-```sh
-cp template.env .env
-```
+You can modify, build, and run the app as you see fit. If you have a useful modification or fix, consider contributing.
 
-### Run
-
-You can run the app in development mode where it will keep running until it's terminated. This supports debugging the TypeScript source
-without transpiling to JavaScript ahead of time.
-
-```sh
-npm run start
-```
-
-The app can be transpiled and ran as a standalone NodeJS app.
-
-```sh
-npm run build
-npm run start:built
-```
-
-### Build
-
-#### Publish NPM
-
-```sh
-# Manual Dev Build Publish : premajor | preminor | prepatch | prerelease
-npm --no-git-tag-version version prerelease
-npm publish --tag beta
-
-# Manual Prod Build Publish : major | minor | patch
-npm version patch
-git push origin v1.0.1
-npm publish
-```
-
-#### Docker Image
-
-There's a [Dockerfile](docker/Dockerfile) that can be used to build a Docker image. Create a multi-architechture docker image and push it
-to a registry with the included [build script](docker/build.sh).
-
-```sh
-docker/build.sh
-# Tag and push to a specific registry and scope
-DOCKER_REGISTRY=myregistry.tld DOCKER_SCOPE=myscope docker/build.sh
-```
+- [developing.md](docs/developing.md)

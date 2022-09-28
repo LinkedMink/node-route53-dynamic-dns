@@ -25,6 +25,7 @@ export const configDefaultMap: Map<ConfigKey, string> = new Map([
   [ConfigKey.BindPort, String(61080)],
 
   [ConfigKey.IpCheckIntervalSeconds, String(5 * 60)],
+  [ConfigKey.IpCheckTimeoutMs, String(5000)],
   [ConfigKey.IpV6Enabled, String(true)],
   [ConfigKey.CacheDnsRecords, String(true)],
 ]);

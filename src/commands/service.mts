@@ -16,7 +16,7 @@ export default (config: EnvironmentConfig) => {
   const main = async () => {
     const logger = initializeLogging(config);
 
-    logger.verbose("Initializing Main");
+    logger.info("Initializing App");
 
     const awsAccessKeyId = config.getString(ConfigKey.AwsAccessKeyId);
     const awsAccessKeySecret = config.getString(ConfigKey.AwsAccessKeySecret);
@@ -58,7 +58,7 @@ export default (config: EnvironmentConfig) => {
 
     void publicIpClient.start();
 
-    logger.verbose("Initialized Main");
+    logger.verbose("Initialized App");
   };
 
   return new Command("service")
