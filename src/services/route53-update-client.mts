@@ -38,9 +38,9 @@ export class Route53UpdateClient implements DnsZoneRecordClient {
       const matchedZoneRecords = await Promise.all(pendingRequest);
 
       this.logger.verbose(
-        `Found matching records for DNS records: count=${
+        `Found matching zones for DNS records: count=${
           matchedZoneRecords.length
-        }, host=${dnsRecordsToMatch.toString()}`
+        }, records=${dnsRecordsToMatch.toString()}`
       );
       logWhenEnabled(
         this.logger,

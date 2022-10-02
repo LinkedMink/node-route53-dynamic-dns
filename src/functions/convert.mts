@@ -17,7 +17,7 @@ export const convertToDnsRecordState = (
 
   return {
     dnsRecords,
-    lastUpdateDateTime: new Date(),
+    lastChangeDateTime: new Date(),
   };
 };
 

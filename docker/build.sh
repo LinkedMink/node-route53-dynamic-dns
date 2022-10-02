@@ -1,7 +1,7 @@
 #/bin/sh
 
 IMAGE_NAME="node-route53-dynamic-dns"
-ARCHITECTURES="linux/amd64,linux/arm64"
+ARCHITECTURES="linux/amd64,linux/arm64,linux/arm/v7"
 DOCKER_ARGS=""
 
 if [ -z "$DOCKER_REGISTRY" ]; then

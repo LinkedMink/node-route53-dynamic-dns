@@ -48,8 +48,11 @@ export default (config: EnvironmentConfig) => {
     const port = config.getNumberOrNull(ConfigKey.BindPort);
     if (port !== null) {
       const healthCheckServer = new HealthCheckServer();
-      dnsRecordSetSource.on(DnsRecordsEvent.Retrieved, healthCheckServer.handleHostRecordsEvent);
-      dnsRecordSetSource.on(DnsRecordsEvent.Updated, healthCheckServer.handleHostRecordsEvent);
+      dnsRecordSetSource.on(
+        DnsRecordsEvent.Retrieved,
+        healthCheckServer.handleRecordsRetrievedEvent
+      );
+      dnsRecordSetSource.on(DnsRecordsEvent.Updated, healthCheckServer.handleRecordsUpdatedEvent);
       publicIpClient.on(PublicIpEvent.Retrieved, healthCheckServer.handlePublicIpEvent);
 
       const host = config.getStringOrNull(ConfigKey.BindHost);

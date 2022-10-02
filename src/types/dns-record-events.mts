@@ -9,7 +9,7 @@ export interface DnsAddressRecord {
 
 export interface DnsAddressRecordState {
   dnsRecords: DnsAddressRecord[];
-  lastUpdateDateTime: Date;
+  lastChangeDateTime: Date;
 }
 
 export type DnsAddressRecordsChangedEventHandler = (event: DnsAddressRecordState) => void;

@@ -2,6 +2,7 @@
 
 [![Build Status](https://github.com/LinkedMink/node-route53-dynamic-dns/actions/workflows/build-main.yml/badge.svg)](https://github.com/LinkedMink/node-route53-dynamic-dns/actions?query=workflow%3A%22build-main%22)
 [![NPM Version](https://img.shields.io/npm/v/@linkedmink/node-route53-dynamic-dns)](https://www.npmjs.com/package/@linkedmink/node-route53-dynamic-dns)
+[![Docker Image Size](https://img.shields.io/docker/image-size/linkedmink/node-route53-dynamic-dns/latest)](https://hub.docker.com/r/linkedmink/node-route53-dynamic-dns)
 
 This is a NodeJS background process that updates AWS Route 53 DNS address records whenever the public IP of the hosting environment changes.
 This can be useful for home or small business networks where an ISP doesn't issue a static IP.
@@ -22,10 +23,10 @@ This can be useful for home or small business networks where an ISP doesn't issu
 
 The README will focus on running the app as a user (see [Additional Documentation](#additional-documentation) for build and dev info)
 
-### Background Service
+### Base Package
 
-You can run the [npm package](https://www.npmjs.com/package/@linkedmink/node-route53-dynamic-dns) as a self-contained executable and
-configure your system to run it in the backgound. Install the package globally.
+You can run the [npm package](https://www.npmjs.com/package/@linkedmink/node-route53-dynamic-dns) as a self-contained executable.
+Install the package globally.
 
 ```sh
 npm install -g @linkedmink/node-route53-dynamic-dns
@@ -49,9 +50,31 @@ After the configuration has been set, execute the packages main command.
 npx node-route53-dynamic-dns
 ```
 
-#### systemd Example
+### Containers
 
-You can configure the app to run as a detached service at system startup. Here's how you can do it on Linux with systemd
+You can run the app on any container runtime like Docker and configure it using environment variables and/or mounted files. A
+[Docker image](https://hub.docker.com/r/linkedmink/node-route53-dynamic-dns) has been built and published to Docker Hub. An example
+configuration [docker-compose.yml](docker/docker-compose.yml) file is included in the repo. It has configuration to mount the
+[secrets.env](docker/secrets.env) as Docker secret. Copy the files and edit them as needed (see [template.env](template.env)).
+
+```sh
+cp docker/{docker-compose.yml,secrets.env} /my/docker/config/path
+
+# Change AWS_ACCESS_KEY_ID, AWS_ACCESS_KEY_SECRET, and HOSTNAMES_TO_UPDATE at minimum
+cd /my/docker/config/path
+nano docker-compose.yml
+nano secrets.env
+
+# Test out the configuration
+sudo docker compose up
+# Run the app in the background
+sudo docker compose up -d
+```
+
+### systemd Example
+
+You can configure the app to run as a detached service at system startup in the background. Here's an example of how you can do
+it on Linux with systemd.
 
 ```sh
 cat << HEREDOC > "node-route53-dynamic-dns.service"
@@ -80,26 +103,6 @@ sudo mv ./node-route53-dynamic-dns.service /etc/systemd/system
 sudo systemctl daemon-reload
 sudo systemctl start node-route53-dynamic-dns
 sudo systemctl enable node-route53-dynamic-dns
-```
-
-### Containers
-
-You can run the app on any container runtime like Docker and configure it using environment variables and/or mounted files. A
-[Docker image](https://hub.docker.com/r/linkedmink/node-route53-dynamic-dns) has been built and published to Docker Hub. An example
-configuration [docker-compose.yml](docker/docker-compose.yml) is included in the repo. It has configuration to mount the
-[secrets.env](docker/secrets.env) as Docker secret. Copy the files and edit them as needed.
-
-```sh
-cp docker/{docker-compose.yml,secrets.env} /my/docker/config/path
-# AWS_ACCESS_KEY_ID, AWS_ACCESS_KEY_SECRET, and HOSTNAMES_TO_UPDATE at minimum
-nano /my/docker/config/path/docker-compose.yml
-nano /my/docker/config/path/secrets.env
-cd /my/docker/config/path
-
-# Test out the configuration
-sudo docker compose up
-# Run the app in the background
-sudo docker compose up -d
 ```
 
 ## Additional Documentation

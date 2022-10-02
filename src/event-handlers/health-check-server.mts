@@ -29,9 +29,13 @@ export class HealthCheckServer {
     return server;
   };
 
-  handleHostRecordsEvent = (event: DnsAddressRecordState) => {
+  handleRecordsRetrievedEvent = (event: DnsAddressRecordState) => {
     this.dnsRecords = event.dnsRecords;
-    this.lastUpdateDateTime = event.lastUpdateDateTime;
+  };
+
+  handleRecordsUpdatedEvent = (event: DnsAddressRecordState) => {
+    this.dnsRecords = event.dnsRecords;
+    this.lastUpdateDateTime = event.lastChangeDateTime;
   };
 
   handlePublicIpEvent = (event: PublicIpState) => {

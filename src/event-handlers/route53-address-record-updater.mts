@@ -6,7 +6,7 @@ import { IpAddresses, PublicIpState } from "../types/public-ip-events.mjs";
 export class Route53AddressRecordUpdater {
   private readonly logger = loggerForModuleUrl(import.meta.url);
 
-  private lastIpUpdated: IpAddresses | null = null;
+  // private lastIpUpdated: IpAddresses | null = null;
   private pendingUpdate: Promise<void> | null = null;
   private eventDuringUpdate: PublicIpState | null = null;
 
@@ -42,10 +42,11 @@ export class Route53AddressRecordUpdater {
   };
 
   private updateRecordsIfOutdated = async (publicIp: IpAddresses): Promise<void> => {
-    if (this.lastIpUpdated?.v4 === publicIp.v4 && this.lastIpUpdated?.v6 === publicIp.v6) {
-      this.logger.verbose("IP addresses not change, do not update records");
-      return;
-    }
+    // Was here to prevent unnecessary filter/map operation in cache mode, but didn't feel like refactoring
+    // if (this.lastIpUpdated?.v4 === publicIp.v4 && this.lastIpUpdated?.v6 === publicIp.v6) {
+    //   this.logger.verbose("IP addresses not changed, do not update records");
+    //   return;
+    // }
 
     const currentRecordSets = await this.recordSource.getRecords();
     const updateZoneRecords = currentRecordSets
@@ -92,7 +93,7 @@ export class Route53AddressRecordUpdater {
       this.logger.info(
         `No outdated records, no update applied for IPs: v4=${publicIp.v4}, v6=${publicIp.v6}`
       );
-      this.lastIpUpdated = publicIp;
+      // this.lastIpUpdated = publicIp;
       return;
     }
 
@@ -106,6 +107,6 @@ export class Route53AddressRecordUpdater {
 
     this.recordSource.updateRecordsAfterSync(updateZoneRecords, statusMap);
 
-    this.lastIpUpdated = publicIp;
+    // this.lastIpUpdated = publicIp;
   };
 }

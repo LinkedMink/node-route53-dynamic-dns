@@ -1,6 +1,6 @@
 {
   "name": "@linkedmink/node-route53-dynamic-dns",
-  "version": "1.0.0-3",
+  "version": "1.0.0-4",
   "description": "Background process that updates AWS Route 53 DNS address records whenever the public IP of the hosting environment changes",
   "keywords": [
     "AWS",
@@ -8,14 +8,24 @@
     "DNS",
     "Dynamic DNS"
   ],
-  "type": "module",
-  "main": "build/index.mjs",
-  "types": "build/index.d.ts",
+  "homepage": "https://github.com/LinkedMink/node-route53-dynamic-dns#readme",
+  "bugs": {
+    "url": "https://github.com/LinkedMink/node-route53-dynamic-dns/issues",
+    "email": "harlan.sang@linkedmink.net"
+  },
   "license": "MIT",
   "author": {
     "name": "Harlan Sang",
-    "email": "harlan.sang@linkedmink.net"
+    "email": "harlan.sang@linkedmink.net",
+    "url": "https://github.com/LinkedMink"
   },
+  "funding": {
+    "type": "individual",
+    "url": "https://github.com/sponsors/LinkedMink"
+  },
+  "type": "module",
+  "main": "build/index.mjs",
+  "types": "build/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/LinkedMink/node-route53-dynamic-dns.git"
