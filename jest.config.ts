@@ -1,5 +1,6 @@
 import { Config } from "@jest/types";
 
+const ignoreCoverageFolders = ["commands", "constants", "types"];
 const ignoreCoverageFiles = ["index"];
 
 const config: Config.InitialOptions = {
@@ -10,9 +11,13 @@ const config: Config.InitialOptions = {
   moduleNameMapper: {
     "^(\\.{1,2}/.*)\\.js$": "$1",
   },
-  testMatch: ["**/tests/**/(*.test|*.spec).{m,c,}ts"],
+  testMatch: ["**/tests/**/(*.test|*.spec).ts"],
+  // TODO fix esm
+  // testMatch: ["**/tests/**/(*.test|*.spec).{m,c,}ts"],
   collectCoverage: false,
-  collectCoverageFrom: [`src/!(types|constants)/**/!(${ignoreCoverageFiles.join("|")}).{m,c,}ts`],
+  collectCoverageFrom: [
+    `src/!(${ignoreCoverageFolders.join("|")})/**/!(${ignoreCoverageFiles.join("|")}).{m,c,}ts`,
+  ],
   // coverageThreshold: {
   //   global: {
   //     statements: 75,

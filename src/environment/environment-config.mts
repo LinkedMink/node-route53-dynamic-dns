@@ -7,6 +7,8 @@ import {
   NodeEnv,
 } from "../constants/config.mjs";
 
+export class ConfigError extends Error {}
+
 /**
  * Cache shared app configuration from files in memory
  */
@@ -42,34 +44,17 @@ export class EnvironmentConfig {
 
   getNumber = (key: ConfigKey): number => {
     const value = this.getConfigValue(key);
-    return Number(value);
+    return this.parseNumberOrThrow(key, value);
   };
 
   getNumberOrNull = (key: ConfigKey): number | null => {
     const value = this.getConfigValueOrNull(key);
-    return value !== null ? Number(value) : null;
+    return value !== null ? this.parseNumberOrThrow(key, value) : null;
   };
 
   getBool = (key: ConfigKey): boolean => {
     const value = this.getConfigValue(key);
-    return value.trim().toLowerCase() === "true";
-  };
-
-  // prettier-ignore
-  getJsonOrString = <T,>(
-    key: ConfigKey
-  ): string | T => {
-    const json = this.jsonData.get(key);
-    if (json) {
-      return json as string | T;
-    }
-
-    const value = this.getConfigValue(key).trim();
-    if (value.length > 0 && (value.startsWith("{") || value.startsWith("["))) {
-      return this.getJson<T>(key);
-    }
-
-    return value;
+    return this.parseBooleanOrThrow(key, value);
   };
 
   // prettier-ignore
@@ -103,7 +88,7 @@ export class EnvironmentConfig {
       return configValue;
     }
 
-    throw new Error(`Environmental variable must be defined: ${key}`);
+    throw new ConfigError(`Environmental variable must be defined: ${key}`);
   };
 
   private getConfigValueOrNull = (key: ConfigKey): string | null => {
@@ -115,5 +100,26 @@ export class EnvironmentConfig {
     }
 
     return null;
+  };
+
+  private parseNumberOrThrow = (key: ConfigKey, value: string): number => {
+    const number = Number(value);
+    if (isNaN(number)) {
+      throw new ConfigError(`Config value is not a number: ${key}=${value}`);
+    }
+
+    return number;
+  };
+
+  private parseBooleanOrThrow = (key: ConfigKey, value: string): boolean => {
+    const stringValue = value.toLowerCase();
+    if (stringValue === "true") {
+      return true;
+    }
+    if (stringValue === "false") {
+      return false;
+    }
+
+    throw new ConfigError(`Config value is not a boolean: ${key}=${value}`);
   };
 }

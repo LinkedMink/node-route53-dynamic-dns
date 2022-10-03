@@ -7,7 +7,7 @@ import { initializeLogging } from "../environment/logger.mjs";
 import { HealthCheckServer } from "../event-handlers/health-check-server.mjs";
 import { PublicIpClient } from "../event-handlers/public-ip-event-emitter.mjs";
 import { Route53AddressRecordUpdater } from "../event-handlers/route53-address-record-updater.mjs";
-import { createDnsRecordSetSource } from "../services/dns-record-set-source.mjs";
+import { Route53DnsRecordSetStore } from "../services/dns-record-set-source.mjs";
 import { Route53UpdateClient } from "../services/route53-update-client.mjs";
 import { DnsZoneRecordClient } from "../types/dns-zone-record-client.mjs";
 import { PublicIpEventEmitter } from "../types/public-ip-events.mjs";
@@ -27,7 +27,7 @@ export default (config: EnvironmentConfig) => {
 
     const inputHostnames = config.getJson<string[]>(ConfigKey.HostnamesToUpdate);
     const isCachedRecordsEnabled = config.getBool(ConfigKey.CacheDnsRecords);
-    const dnsRecordSetSource = createDnsRecordSetSource(
+    const dnsRecordSetSource = new Route53DnsRecordSetStore(
       route53Client,
       isCachedRecordsEnabled,
       inputHostnames

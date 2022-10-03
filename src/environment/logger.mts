@@ -4,7 +4,7 @@ import * as winston from "winston";
 import TransportStream from "winston-transport";
 import { ConfigKey } from "../constants/config.mjs";
 import { DEFAULT_LOGGER_LABEL, DEFAULT_LOG_LEVEL, LogLevel } from "../constants/logging.mjs";
-import { getNumericEnumKeys } from "../functions/convert.mjs";
+import { getEnumKeys } from "../functions/convert.mjs";
 import { formatError } from "../functions/format.mjs";
 import { EnvironmentConfig } from "./environment-config.mjs";
 
@@ -108,7 +108,7 @@ export const initializeLogging = (config: EnvironmentConfig): winston.Logger => 
     const logLevel = config.getString(ConfigKey.LogLevel);
     const numericLogLevel = LogLevel[logLevel as keyof typeof LogLevel];
     if (numericLogLevel === undefined || isNaN(numericLogLevel)) {
-      const allowed = getNumericEnumKeys(LogLevel).toString();
+      const allowed = getEnumKeys(LogLevel).toString();
       throw new Error(`Log level is invalid: value=${logLevel}, allowed=${allowed}`);
     }
 

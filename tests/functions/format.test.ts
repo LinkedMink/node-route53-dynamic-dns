@@ -1,12 +1,13 @@
+import path from "path";
 import { formatError } from "../../src/functions/format.mjs";
 
-describe(formatError.name, () => {
+describe(path.basename(__filename, ".test.ts"), () => {
   test("should format as stack trace when type is error", () => {
     const error = new Error("TEST");
 
     const result = formatError(error);
 
-    expect(result).toContain("format.test.ts:5");
+    expect(result).toContain("format.test.ts:6");
   });
 
   test("should format as string when type is string", () => {

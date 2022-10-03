@@ -12,8 +12,8 @@
       "outputCapture": "std"
     },
     {
-      "command": "npm run script:create-policy-json",
-      "name": "Run npm script:create-policy-json",
+      "command": "npm run cmd:iam-policy",
+      "name": "Run npm cmd:iam-policy",
       "request": "launch",
       "type": "node-terminal",
       "outputCapture": "std"

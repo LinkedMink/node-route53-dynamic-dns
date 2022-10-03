@@ -4,9 +4,13 @@
   "description": "Background process that updates AWS Route 53 DNS address records whenever the public IP of the hosting environment changes",
   "keywords": [
     "AWS",
-    "Route53",
+    "Route 53",
     "DNS",
-    "Dynamic DNS"
+    "Dynamic DNS",
+    "Public IP",
+    "Executable",
+    "CLI",
+    "Containers"
   ],
   "homepage": "https://github.com/LinkedMink/node-route53-dynamic-dns#readme",
   "bugs": {
@@ -71,6 +75,7 @@
     "eslint-config-prettier": "^8.5.0",
     "husky": "^8.0.1",
     "jest": "^29.0.3",
+    "jest-mock-extended": "^3.0.1",
     "lint-staged": "^13.0.3",
     "prettier": "^2.7.1",
     "rimraf": "^3.0.2",
