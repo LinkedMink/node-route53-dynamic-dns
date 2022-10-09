@@ -1,6 +1,5 @@
 import http, { Server, IncomingMessage, ServerResponse } from "http";
 import { loggerForModuleUrl } from "../environment/logger.mjs";
-
 import { IpAddresses, PublicIpState } from "../types/public-ip-events.mjs";
 import { HealthCheckResponse } from "../types/health-response.mjs";
 import { DnsAddressRecord, DnsAddressRecordState } from "../types/dns-record-events.mjs";

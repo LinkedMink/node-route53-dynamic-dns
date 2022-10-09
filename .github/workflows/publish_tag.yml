@@ -12,7 +12,7 @@ on:
 jobs:
   build:
     if: github.ref == 'refs/heads/main'
-    uses: LinkedMink/node-route53-dynamic-dns/.github/workflows/build.yml@main
+    uses: LinkedMink/shared-scripts/.github/workflows/publish-artifacts-for-tag.yml@main
     with:
       uploadBuild: true
   publish:

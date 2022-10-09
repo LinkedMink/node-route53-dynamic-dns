@@ -49,7 +49,11 @@
     "test:debug": "jest --cache=false --detectOpenHandles --runInBand --watchAll",
     "postinstall": "husky install || cd .",
     "lint": "eslint {src,tests}/**/*.{m,c,}ts *.{,m,c}{j,t}s",
-    "doc": "typedoc"
+    "doc": "typedoc",
+    "clean": "rimraf build coverage *.log",
+    "preversion": "npm run lint && npm run test:ci",
+    "version": "npm run build && git add .",
+    "postversion": "bash ./docker/build.sh && git push && git push --tags"
   },
   "bin": {
     "node-route53-dynamic-dns": "./build/index.mjs"
@@ -80,6 +84,7 @@
     "prettier": "^2.7.1",
     "rimraf": "^3.0.2",
     "ts-jest": "^29.0.2",
+    "ts-jest-mock-import-meta": "^0.12.0",
     "ts-node": "^10.9.1",
     "type-fest": "^3.0.0",
     "typedoc": "^0.23.15",

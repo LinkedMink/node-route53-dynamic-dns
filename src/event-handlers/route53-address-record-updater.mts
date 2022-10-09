@@ -2,8 +2,9 @@ import { loggerForModuleUrl } from "../environment/logger.mjs";
 import { DnsRecordSetSource } from "../types/dns-record-events.mjs";
 import { DnsZoneRecordClient } from "../types/dns-zone-record-client.mjs";
 import { IpAddresses, PublicIpState } from "../types/public-ip-events.mjs";
+import { Disposable } from "../types/utility.mjs";
 
-export class Route53AddressRecordUpdater {
+export class Route53AddressRecordUpdater implements Disposable {
   private readonly logger = loggerForModuleUrl(import.meta.url);
 
   // private lastIpUpdated: IpAddresses | null = null;
@@ -15,6 +16,12 @@ export class Route53AddressRecordUpdater {
     private readonly recordSource: DnsRecordSetSource
   ) {}
 
+  dispose = async (): Promise<void> => {
+    if (this.pendingUpdate) {
+      await this.pendingUpdate;
+    }
+  };
+
   /**
    * When the public IP changes, check if any host records have an out of date ip. If they do, start an update for each out of
    * date record and wait for the change to synchronize. The AWS service updates the records asynchronously.
@@ -24,7 +31,7 @@ export class Route53AddressRecordUpdater {
    * only want to use the latest IP to make the public IP update independent of the host record update without queuing events that
    * won't be relevant anymore.
    */
-  handlePublicIpUpdate = (event: PublicIpState): void => {
+  handlePublicIpUpdate = async (event: PublicIpState): Promise<void> => {
     if (this.pendingUpdate) {
       this.logger.debug("Pending update in progress, defer update until finished");
       this.eventDuringUpdate = event;
@@ -32,8 +39,9 @@ export class Route53AddressRecordUpdater {
     }
 
     this.pendingUpdate = this.updateRecordsIfOutdated(event.publicIpAddresses);
-
+    await this.pendingUpdate;
     this.pendingUpdate = null;
+
     if (this.eventDuringUpdate) {
       const eventPending = this.eventDuringUpdate;
       this.eventDuringUpdate = null;
@@ -53,8 +61,10 @@ export class Route53AddressRecordUpdater {
       .filter(z =>
         z.records.some(
           s =>
-            (s.Type === "A" && s.ResourceRecords.some(r => r.Value !== publicIp.v4)) ||
-            (s.Type === "AAAA" && s.ResourceRecords.some(r => r.Value !== publicIp.v6))
+            (s.Type === "A" &&
+              s.ResourceRecords.some(r => publicIp.v4 && r.Value !== publicIp.v4)) ||
+            (s.Type === "AAAA" &&
+              s.ResourceRecords.some(r => publicIp.v6 && r.Value !== publicIp.v6))
         )
       )
       .map(z => ({

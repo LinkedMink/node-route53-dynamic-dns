@@ -14,7 +14,7 @@ on:
 
 jobs:
   build:
-    uses: LinkedMink/shared-scripts/.github/workflows/build-npm-package.yml@main
+    uses: LinkedMink/shared-scripts/.github/workflows/publish-artifacts-for-tag.yml@main
     with:
       uploadBuild: true
   publish:

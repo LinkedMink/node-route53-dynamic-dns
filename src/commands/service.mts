@@ -43,6 +43,7 @@ export default (config: EnvironmentConfig) => {
       ipUpdateTimeout,
       isIpV6Enabled
     );
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     publicIpClient.on(PublicIpEvent.Retrieved, route53Updater.handlePublicIpUpdate);
 
     const port = config.getNumberOrNull(ConfigKey.BindPort);

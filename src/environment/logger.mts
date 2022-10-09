@@ -49,7 +49,7 @@ let loggerOptionsFunc = getDefaultOptions;
  */
 export const loggerForLabel = (label = DEFAULT_LOGGER_LABEL): winston.Logger => {
   if (!winston.loggers.has(label)) {
-    winston.loggers.add(label, loggerOptionsFunc(label));
+    return winston.loggers.add(label, loggerOptionsFunc(label));
   }
 
   return winston.loggers.get(label);
@@ -77,11 +77,11 @@ export const loggerForModuleUrl = (moduleUrl: string): winston.Logger => {
 export const logWhenEnabled = (
   logger: winston.Logger,
   level: LogLevel,
-  messageFunc: () => string
+  messageFunc: (loggerLevel: LogLevel) => string
 ): void => {
   const loggerLevel = LogLevel[logger.level as keyof typeof LogLevel];
-  if (typeof loggerLevel === "number" && level <= loggerLevel) {
-    logger.log(LogLevel[level], messageFunc());
+  if (level <= loggerLevel) {
+    logger.log(LogLevel[level], messageFunc(loggerLevel));
   }
 };
 
@@ -123,13 +123,18 @@ export const initializeLogging = (config: EnvironmentConfig): winston.Logger => 
   loggerOptionsFunc = getLoggerOptions;
 
   const logger = loggerForLabel();
-  process.on("uncaughtException", (error: unknown) => {
-    logger.error(`uncaughtException: ${formatError(error)}`);
-  });
 
-  process.on("unhandledRejection", (error: unknown) => {
-    logger.error(`unhandledRejection: ${formatError(error)}`);
-  });
+  if (process.listenerCount("uncaughtException") <= 0) {
+    process.on("uncaughtException", (error: Error, _origin: NodeJS.UncaughtExceptionOrigin) => {
+      logger.error(`uncaughtException: ${formatError(error)}`);
+    });
+  }
+
+  if (process.listenerCount("unhandledRejection") <= 0) {
+    process.on("unhandledRejection", (error: unknown, _rejected: Promise<unknown>) => {
+      logger.error(`unhandledRejection: ${formatError(error)}`);
+    });
+  }
 
   logger.verbose(`${initializeLogging.name}: Logger Initialized`);
 
