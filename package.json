@@ -1,6 +1,6 @@
 {
   "name": "@linkedmink/node-route53-dynamic-dns",
-  "version": "1.0.1-0",
+  "version": "1.0.1",
   "description": "Background process that updates AWS Route 53 DNS address records whenever the public IP of the hosting environment changes",
   "keywords": [
     "AWS",
