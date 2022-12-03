@@ -41,6 +41,7 @@ npm publish --tag beta
 
 # Manual Prod Build Publish : major | minor | patch
 npm version patch
+git push
 git push origin v1.0.1
 npm publish
 ```

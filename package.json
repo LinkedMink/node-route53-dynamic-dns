@@ -1,6 +1,6 @@
 {
   "name": "@linkedmink/node-route53-dynamic-dns",
-  "version": "1.0.0",
+  "version": "1.0.1-0",
   "description": "Background process that updates AWS Route 53 DNS address records whenever the public IP of the hosting environment changes",
   "keywords": [
     "AWS",
@@ -53,7 +53,7 @@
     "clean": "rimraf build coverage *.log",
     "preversion": "npm run lint && npm run test:ci",
     "version": "npm run build && git add .",
-    "postversion": "bash ./docker/build.sh && git push && git push --tags"
+    "postversion": "bash ./docker/build.sh"
   },
   "bin": {
     "node-route53-dynamic-dns": "./build/index.mjs"
@@ -64,15 +64,13 @@
     "commander": "^9.4.0",
     "dotenv": "^16.0.2",
     "public-ip": "^6.0.1",
-    "uuid": "^9.0.0",
     "winston": "^3.8.2"
   },
   "devDependencies": {
-    "@tsconfig/node16": "^1.0.3",
+    "@tsconfig/node18": "^1.0.1",
     "@types/eslint": "^8.4.6",
     "@types/jest": "^29.0.3",
-    "@types/node": "^16.11.60",
-    "@types/uuid": "^8.3.4",
+    "@types/node": "^18.11.10",
     "@typescript-eslint/eslint-plugin": "^5.38.0",
     "@typescript-eslint/parser": "^5.38.0",
     "eslint": "^8.24.0",

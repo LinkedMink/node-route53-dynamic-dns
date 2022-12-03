@@ -1,4 +1,4 @@
-import { v4 as uuidV4 } from "uuid";
+import { randomUUID } from "crypto";
 
 const POLICY_JSON_VERSION = "2012-10-17";
 const ROUTE53_ARN_PREFIX = "arn:aws:route53:::";
@@ -24,7 +24,7 @@ export const createRoute53PolicyForZones = (zoneIds: Map<string, string[]>) => {
   const listZoneResources = Array.from(zoneIds.keys()).map(zoneIdToArn);
   return {
     Version: POLICY_JSON_VERSION,
-    Id: uuidV4(),
+    Id: randomUUID(),
     Statement: [
       {
         Effect: "Allow",
