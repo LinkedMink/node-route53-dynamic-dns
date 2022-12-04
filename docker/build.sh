@@ -3,6 +3,7 @@
 IMAGE_NAME="node-route53-dynamic-dns"
 ARCHITECTURES="linux/amd64,linux/arm64,linux/arm/v7"
 DOCKER_ARGS=""
+VERSION=$(npm pkg get version | sed 's/"//g')
 
 if [ -z "$DOCKER_REGISTRY" ]; then
   DOCKER_REGISTRY="" 
@@ -25,6 +26,7 @@ docker buildx build . \
   --file "docker/Dockerfile" \
   --platform "${ARCHITECTURES}" \
   --tag "${DOCKER_REGISTRY}${DOCKER_SCOPE}${IMAGE_NAME}:latest" \
+  --tag "${DOCKER_REGISTRY}${DOCKER_SCOPE}${IMAGE_NAME}:${VERSION}" \
   --progress "plain" \
   --push \
 

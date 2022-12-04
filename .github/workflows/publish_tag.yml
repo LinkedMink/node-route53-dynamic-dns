@@ -11,12 +11,10 @@ on:
 
 jobs:
   build:
-    if: github.ref == 'refs/heads/main'
     uses: LinkedMink/shared-scripts/.github/workflows/build-npm-package.yml@main
     with:
       uploadBuild: true
   publish:
-    if: github.ref == 'refs/heads/main'
     needs: build
     uses: LinkedMink/shared-scripts/.github/workflows/publish-artifacts-for-tag.yml@main
     with:
