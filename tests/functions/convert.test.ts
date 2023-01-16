@@ -1,4 +1,4 @@
-import path from "path";
+import path from "node:path";
 import { getEnumKeys } from "../../src/functions/convert.mjs";
 
 describe(path.basename(__filename, ".test.ts"), () => {

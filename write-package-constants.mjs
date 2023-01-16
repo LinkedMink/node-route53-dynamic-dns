@@ -1,6 +1,6 @@
-import fs from "fs/promises";
-import path from "path";
-import { fileURLToPath } from "url";
+import fs from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import packageData from "./package.json" assert { type: "json" };
 
 const VERSION_CONSTANT_PATH = "./src/constants/version.mts";

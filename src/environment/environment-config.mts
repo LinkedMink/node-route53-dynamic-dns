@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-import fs from "fs/promises";
+import fs from "node:fs/promises";
 import {
   configDefaultMap,
   ConfigKey,

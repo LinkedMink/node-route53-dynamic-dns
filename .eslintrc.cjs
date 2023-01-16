@@ -5,7 +5,7 @@ const config = {
   root: true,
   env: {
     node: true,
-    es2021: true,
+    es2022: true,
   },
   ignorePatterns: ["build/**", "coverage/**", "write-package-constants.mjs"],
   overrides: [

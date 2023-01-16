@@ -1,4 +1,4 @@
-import path from "path";
+import path from "node:path";
 import { PublicIpClient } from "../../src/event-handlers/public-ip-event-emitter.mjs";
 
 /**

@@ -1,5 +1,5 @@
 import { Change, ChangeStatus, Route53 } from "@aws-sdk/client-route-53";
-import { setTimeout } from "timers/promises";
+import { setTimeout } from "node:timers/promises";
 import { CHANGE_INSYNC_INTERVAL_MS, CHANGE_INSYNC_LIMIT_MS } from "../constants/behavior.mjs";
 import { LogLevel } from "../constants/logging.mjs";
 import { loggerForModuleUrl, logWhenEnabled } from "../environment/logger.mjs";

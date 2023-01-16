@@ -1,6 +1,6 @@
 import { mock } from "jest-mock-extended";
-import path from "path";
-import { EventEmitter } from "stream";
+import path from "node:path";
+import { EventEmitter } from "node:stream";
 import { Route53AddressRecordUpdater } from "../../src/event-handlers/route53-address-record-updater.mjs";
 import { DnsRecordSetSource } from "../../src/types/dns-record-events.mjs";
 import {

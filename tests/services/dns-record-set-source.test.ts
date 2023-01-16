@@ -1,5 +1,5 @@
 import { mock } from "jest-mock-extended";
-import path from "path";
+import path from "node:path";
 import { DnsRecordsEvent } from "../../src/constants/events.mjs";
 import { Route53DnsRecordSetStore } from "../../src/services/dns-record-set-source.mjs";
 import { DnsZoneRecordClient, DnsZoneRecordSets } from "../../src/types/dns-zone-record-client.mjs";

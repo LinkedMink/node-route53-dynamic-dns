@@ -1,6 +1,6 @@
-import EventEmitter from "events";
+import EventEmitter from "node:events";
+import { setInterval } from "node:timers/promises";
 import { IpNotFoundError, publicIpv4, publicIpv6 } from "public-ip";
-import { setInterval } from "timers/promises";
 import {
   MINIMUM_IP_RETRIEVE_TIMEOUT_MS,
   MINIMUM_IP_RETRIEVE_UPDATE_DIFF_MS,
