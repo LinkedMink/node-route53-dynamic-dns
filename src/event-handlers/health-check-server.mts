@@ -1,4 +1,4 @@
-import http, { Server, IncomingMessage, ServerResponse } from "http";
+import http, { Server, IncomingMessage, ServerResponse } from "node:http";
 import { loggerForModuleUrl } from "../environment/logger.mjs";
 import { IpAddresses, PublicIpState } from "../types/public-ip-events.mjs";
 import { HealthCheckResponse } from "../types/health-response.mjs";

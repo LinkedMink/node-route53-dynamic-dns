@@ -1,4 +1,4 @@
-import path from "path";
+import path from "node:path";
 import { validateNormalizeDnsRecord } from "../../src/functions/validate.mjs";
 
 describe(path.basename(__filename, ".test.ts"), () => {

@@ -1,11 +1,11 @@
 import dotenv from "dotenv";
-import fs from "fs/promises";
-import path from "path";
+import fs from "node:fs/promises";
+import path from "node:path";
 import { ConfigKey } from "../../src/constants/config.mjs";
 import { EnvironmentConfig } from "../../src/environment/environment-config.mjs";
 
 jest.mock("dotenv");
-jest.mock("fs/promises");
+jest.mock("node:fs/promises");
 
 const ENV_VARS_TO_RESET = ["NODE_ENV", "IS_CONTAINERIZED_ENV_VAR", ConfigKey.BindHost];
 

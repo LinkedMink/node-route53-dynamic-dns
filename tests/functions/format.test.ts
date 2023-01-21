@@ -1,4 +1,4 @@
-import path from "path";
+import path from "node:path";
 import { formatError } from "../../src/functions/format.mjs";
 
 describe(path.basename(__filename, ".test.ts"), () => {

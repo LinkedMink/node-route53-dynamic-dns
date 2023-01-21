@@ -1,4 +1,4 @@
-import { isNativeError } from "util/types";
+import { isNativeError } from "node:util/types";
 import { isStringConvertable } from "./type-check.mjs";
 
 export const formatError = (error: unknown): string => {

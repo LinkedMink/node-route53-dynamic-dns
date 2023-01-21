@@ -11,6 +11,6 @@ on:
 
 jobs:
   build:
-    uses: LinkedMink/shared-scripts/.github/workflows/build-npm-package.yml@main
+    uses: LinkedMink/.github/.github/workflows/build-npm-package.yml@main
     with:
       uploadBuild: false

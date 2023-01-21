@@ -1,12 +1,12 @@
 import { jest } from "@jest/globals";
-import { createServer, IncomingMessage, RequestListener, Server, ServerResponse } from "http";
 import { mock } from "jest-mock-extended";
-import path from "path";
+import { createServer, IncomingMessage, RequestListener, Server, ServerResponse } from "node:http";
+import path from "node:path";
 import { HealthCheckServer } from "../../src/event-handlers/health-check-server.mjs";
 import { DnsAddressRecordState } from "../../src/types/dns-record-events.mjs";
 import { PublicIpState } from "../../src/types/public-ip-events.mjs";
 
-jest.mock("http");
+jest.mock("node:http");
 
 describe(path.basename(__filename, ".test.ts"), () => {
   test("should start HTTP server and listen when start() called", async () => {

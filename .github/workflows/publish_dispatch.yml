@@ -14,12 +14,12 @@ on:
 
 jobs:
   build:
-    uses: LinkedMink/shared-scripts/.github/workflows/build-npm-package.yml@main
+    uses: LinkedMink/.github/.github/workflows/build-npm-package.yml@main
     with:
       uploadBuild: true
   publish:
     needs: build
-    uses: LinkedMink/shared-scripts/.github/workflows/publish-artifacts-for-tag.yml@main
+    uses: LinkedMink/.github/.github/workflows/publish-artifacts-for-tag.yml@main
     with:
       uploadToTag: ${{ github.event.inputs.uploadToTag }}
       uploadedBuildName: ${{ needs.build.outputs.uploadedBuildName }} 

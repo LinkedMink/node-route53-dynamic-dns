@@ -1,4 +1,4 @@
-import path from "path";
+import path from "node:path";
 import { createRoute53PolicyForZones } from "../../src/functions/aws-iam-policy.mjs";
 
 describe(path.basename(__filename, ".test.ts"), () => {

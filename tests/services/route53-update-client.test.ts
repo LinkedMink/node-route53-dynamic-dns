@@ -6,12 +6,11 @@ import {
   Route53,
 } from "@aws-sdk/client-route-53";
 import { mock } from "jest-mock-extended";
-import path from "path";
-import { CHANGE_INSYNC_LIMIT_MS } from "../../src/constants/behavior.mjs";
+import path from "node:path";
 import { Route53UpdateClient } from "../../src/services/route53-update-client.mjs";
 
 jest.mock("@aws-sdk/client-route-53");
-jest.mock("timers/promises", () => ({
+jest.mock("node:timers/promises", () => ({
   setTimeout: () => Promise.resolve(),
 }));
 

@@ -1,4 +1,4 @@
-import { randomUUID } from "crypto";
+import { randomUUID } from "node:crypto";
 
 const POLICY_JSON_VERSION = "2012-10-17";
 const ROUTE53_ARN_PREFIX = "arn:aws:route53:::";

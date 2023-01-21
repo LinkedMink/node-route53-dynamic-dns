@@ -1,5 +1,5 @@
 import { mock } from "jest-mock-extended";
-import path from "path";
+import path from "node:path";
 import winston from "winston";
 import { LogLevel } from "../../src/constants/logging.mjs";
 import { EnvironmentConfig } from "../../src/environment/environment-config.mjs";
