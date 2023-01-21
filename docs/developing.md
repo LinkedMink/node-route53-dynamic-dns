@@ -45,7 +45,7 @@ npm publish --tag beta
 
 # Manual Prod Build Publish : major | minor | patch
 npm version patch
-export VERSION_NOW=$(node -p "require('./package.json').version")
+export VERSION_NOW=v$(npm pkg get version | sed 's/"//g')
 git push
 git push origin ${VERSION_NOW}
 npm publish
