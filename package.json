@@ -1,6 +1,6 @@
 {
   "name": "@linkedmink/node-route53-dynamic-dns",
-  "version": "1.0.2",
+  "version": "1.0.3-0",
   "description": "Background process that updates AWS Route 53 DNS address records whenever the public IP of the hosting environment changes",
   "keywords": [
     "AWS",
@@ -38,10 +38,10 @@
     "node": ">=16"
   },
   "scripts": {
-    "start": "ts-node --esm --project src/tsconfig.json --transpile-only src/index.mts",
+    "start": "tsx watch --tsconfig src/tsconfig.json src/index.mts",
     "start:built": "node --enable-source-maps build/index.mjs",
-    "cmd:iam-policy": "ts-node --esm --project src/tsconfig.json --transpile-only src/index.mts iam-policy",
-    "prebuild": "node write-package-constants.mjs",
+    "cmd:iam-policy": "tsx --tsconfig src/tsconfig.json src/index.mts iam-policy",
+    "prebuild": "tsx write-package-constants.mts",
     "build": "rimraf build && tsc --project src/tsconfig.json",
     "prepack": "npm run build",
     "test": "jest --watchAll",
@@ -61,13 +61,13 @@
   "dependencies": {
     "@aws-sdk/client-route-53": "^3.178.0",
     "chalk": "^5.0.1",
-    "commander": "^10.0.0",
+    "commander": "^11.0.0",
     "dotenv": "^16.0.2",
     "public-ip": "^6.0.1",
     "winston": "^3.8.2"
   },
   "devDependencies": {
-    "@tsconfig/node18": "^1.0.1",
+    "@tsconfig/node18": "^2.0.1",
     "@types/eslint": "^8.4.6",
     "@types/jest": "^29.0.3",
     "@types/node": "^18.11.10",
@@ -80,12 +80,13 @@
     "jest-mock-extended": "^3.0.1",
     "lint-staged": "^13.0.3",
     "prettier": "^2.7.1",
-    "rimraf": "^4.0.7",
+    "rimraf": "^5.0.1",
     "ts-jest": "^29.0.2",
     "ts-jest-mock-import-meta": "^1.0.0",
     "ts-node": "^10.9.1",
+    "tsx": "^3.12.7",
     "type-fest": "^3.0.0",
-    "typedoc": "^0.23.15",
-    "typescript": "^4.8.3"
+    "typedoc": "^0.24.8",
+    "typescript": "^5.1.3"
   }
 }

@@ -1,3 +1,5 @@
+// @ts-check
+
 const MJS_EXT_REGEX = /\.mjs$/i;
 
 /**

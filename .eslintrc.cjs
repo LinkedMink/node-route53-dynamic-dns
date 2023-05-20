@@ -1,3 +1,18 @@
+// @ts-check
+
+/**
+ * @type {Partial<import("eslint").Linter.ConfigOverride>}
+ */
+const tsRecommendedRules = {
+  extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier"],
+  rules: {
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      { argsIgnorePattern: "^_", varsIgnorePattern: "_" },
+    ],
+  },
+};
+
 /**
  * @type {import("eslint").ESLint.ConfigData}
  */
@@ -9,6 +24,13 @@ const config = {
   },
   ignorePatterns: ["build/**", "coverage/**", "write-package-constants.mjs"],
   overrides: [
+    {
+      files: ["**/*.{m,c,}ts"],
+      parserOptions: {
+        project: ["tsconfig.json"],
+      },
+      ...tsRecommendedRules,
+    },
     {
       files: ["src/**/*.{m,c,}ts"],
       extends: [
@@ -39,17 +61,10 @@ const config = {
     },
     {
       files: ["tests/**/*.{m,c,}ts", "jest.config.ts"],
-      extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier"],
-      parser: "@typescript-eslint/parser",
       parserOptions: {
         project: ["tests/tsconfig.json"],
       },
-      rules: {
-        "@typescript-eslint/no-unused-vars": [
-          "error",
-          { argsIgnorePattern: "^_", varsIgnorePattern: "_" },
-        ],
-      },
+      ...tsRecommendedRules,
     },
     {
       files: ["*.{c,}js"],

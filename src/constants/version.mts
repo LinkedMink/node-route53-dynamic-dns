@@ -1,6 +1,6 @@
 /**
- * @file auto-generated from 'write-package-constants.mjs'
+ * @file auto-generated from 'write-package-constants.mts'
  */
 
 export const PACKAGE_UNSCOPED_NAME = "node-route53-dynamic-dns";
-export const PACKAGE_VERSION = "1.0.2";
+export const PACKAGE_VERSION = "1.0.3-0";

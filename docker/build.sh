@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 IMAGE_NAME="node-route53-dynamic-dns"
-ARCHITECTURES="linux/amd64,linux/arm64,linux/arm/v7"
+ARCHITECTURES="linux/amd64,linux/amd64/v3,linux/arm64"
 DOCKER_ARGS=""
 VERSION=$(npm pkg get version | sed 's/"//g')
 

@@ -71,42 +71,7 @@ sudo docker compose up
 sudo docker compose up -d
 ```
 
-### systemd Example
-
-You can configure the app to run as a detached service at system startup in the background. Here's an example of how you can do
-it on Linux with systemd.
-
-```sh
-cat << HEREDOC > "node-route53-dynamic-dns.service"
-# /etc/systemd/system/node-route53-dynamic-dns.service
-[Unit]
-Description=NodeJS client to update AWS Route53 DNS records from the host's public IP
-
-[Service]
-# WorkingDirectory=/path/to/.env/directory
-# Or configure with environment variables
-# Environment=HOSTNAMES_TO_UPDATE=["myhost.public.tld"]
-# Environment=AWS_ACCESS_KEY_ID=
-# Environment=AWS_ACCESS_KEY_SECRET=
-# Or use systemd EnvironmentFile
-# EnvironmentFile=/path/to/envFile
-
-ExecStart=/usr/bin/env npx node-route53-dynamic-dns
-
-TimeoutStartSec=0
-
-[Install]
-WantedBy=multi-user.target
-HEREDOC
-
-sudo mv ./node-route53-dynamic-dns.service /etc/systemd/system
-sudo systemctl daemon-reload
-sudo systemctl start node-route53-dynamic-dns
-sudo systemctl enable node-route53-dynamic-dns
-```
-
 ## Additional Documentation
 
-You can modify, build, and run the app as you see fit. If you have a useful modification or fix, consider contributing.
-
-- [developing.md](docs/developing.md)
+- [Alternative Usage](docs/alternative-usage.md): Some additional examples of running the app on various systems
+- [Developing](docs/developing.md): You can modify, build, and run the app as you see fit. If you have a useful modification or fix, consider contributing.
