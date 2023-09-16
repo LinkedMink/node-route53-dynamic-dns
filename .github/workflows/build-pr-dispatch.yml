@@ -1,9 +1,11 @@
-name: Build ref
+---
+name: Build Pull Requests and Dispatch
 
 concurrency:
   group: build-${{ github.ref }}
   cancel-in-progress: true
 
+# yamllint disable-line rule:truthy
 on:
   push:
     branches-ignore:

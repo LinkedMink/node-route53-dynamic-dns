@@ -8,6 +8,7 @@ coverage/
 
 # production
 build/
+docker/package/
 *.tgz
 
 # misc

@@ -5,7 +5,6 @@ import {
   ListResourceRecordSetsCommandOutput,
   Route53,
 } from "@aws-sdk/client-route-53";
-import { mock } from "jest-mock-extended";
 import path from "node:path";
 import { Route53UpdateClient } from "../../src/services/route53-update-client.mjs";
 
@@ -18,14 +17,12 @@ describe(path.basename(__filename, ".test.ts"), () => {
   // beforeEach(() => jest.useRealTimers())
 
   test("should construct Route53 client with access key when constructed", () => {
-    const mockRoute53 = mock<Route53>();
-    const mockRoute53Constructor = jest.mocked(Route53);
-    mockRoute53Constructor.mockReturnValue(mockRoute53);
+    const mockRoute53 = jest.mocked(Route53);
 
     const result = new Route53UpdateClient("FAKE_KEY_ID", "FAKE_KEY_SECRET");
 
     expect(result).toBeTruthy();
-    expect(mockRoute53Constructor).toHaveBeenCalledWith({
+    expect(mockRoute53).toHaveBeenCalledWith({
       region: "REGION",
       credentials: {
         accessKeyId: "FAKE_KEY_ID",
@@ -35,11 +32,9 @@ describe(path.basename(__filename, ".test.ts"), () => {
   });
 
   test("should call listHostedZones and throw when getZonesForDnsRecords called and result not expected", async () => {
-    const mockRoute53 = mock<Route53>();
+    const mockRoute53 = jest.mocked(Route53);
     const mockResponse: Partial<ListHostedZonesCommandOutput> = {};
-    mockRoute53.listHostedZones.mockResolvedValue(mockResponse as never);
-    const mockRoute53Constructor = jest.mocked(Route53);
-    mockRoute53Constructor.mockReturnValue(mockRoute53);
+    mockRoute53.prototype.listHostedZones.mockResolvedValue(mockResponse as never);
 
     const client = new Route53UpdateClient("FAKE_KEY_ID", "FAKE_KEY_SECRET");
     const action = client.getZonesForDnsRecords(["test.mydomain.tld."]);
@@ -48,7 +43,7 @@ describe(path.basename(__filename, ".test.ts"), () => {
   });
 
   test("should call listHostedZones and transform when getZonesForDnsRecords called and result is expected", async () => {
-    const mockRoute53 = mock<Route53>();
+    const mockRoute53 = jest.mocked(Route53);
     const mockResponse: Partial<ListHostedZonesCommandOutput> = {
       HostedZones: [
         {
@@ -63,9 +58,7 @@ describe(path.basename(__filename, ".test.ts"), () => {
         },
       ],
     };
-    mockRoute53.listHostedZones.mockResolvedValue(mockResponse as never);
-    const mockRoute53Constructor = jest.mocked(Route53);
-    mockRoute53Constructor.mockReturnValue(mockRoute53);
+    mockRoute53.prototype.listHostedZones.mockResolvedValue(mockResponse as never);
 
     const client = new Route53UpdateClient("FAKE_KEY_ID", "FAKE_KEY_SECRET");
     const result = await client.getZonesForDnsRecords([
@@ -75,13 +68,13 @@ describe(path.basename(__filename, ".test.ts"), () => {
       "test3.tld.",
     ]);
 
-    expect(mockRoute53.listHostedZones).toHaveBeenCalled();
+    expect(mockRoute53.prototype.listHostedZones).toHaveBeenCalled();
     expect(result.get("TEST_ID_1")).toEqual(["sub1.test1.tld.", "sub2.test1.tld."]);
     expect(result.get("TEST_ID_2")).toEqual(["test2.tld."]);
   });
 
   test("should call listResourceRecordSets and transform when getZoneRecords called and result is expected", async () => {
-    const mockRoute53 = mock<Route53>();
+    const mockRoute53 = jest.mocked(Route53);
     const mockZoneResponse: Partial<ListHostedZonesCommandOutput> = {
       HostedZones: [
         {
@@ -96,7 +89,7 @@ describe(path.basename(__filename, ".test.ts"), () => {
         },
       ],
     };
-    mockRoute53.listHostedZones.mockResolvedValue(mockZoneResponse as never);
+    mockRoute53.prototype.listHostedZones.mockResolvedValue(mockZoneResponse as never);
     const mockTest1RecordResponse: Partial<ListResourceRecordSetsCommandOutput> = {
       ResourceRecordSets: [
         {
@@ -131,16 +124,13 @@ describe(path.basename(__filename, ".test.ts"), () => {
     const mockTest2RecordResponse: Partial<ListResourceRecordSetsCommandOutput> = {
       ResourceRecordSets: [],
     };
-    mockRoute53.listResourceRecordSets.mockImplementation(request => {
+    mockRoute53.prototype.listResourceRecordSets.mockImplementation(request => {
       if (request.HostedZoneId === "TEST_ID_1") {
         return mockTest1RecordResponse;
       } else {
         return mockTest2RecordResponse;
       }
     });
-
-    const mockRoute53Constructor = jest.mocked(Route53);
-    mockRoute53Constructor.mockReturnValue(mockRoute53);
 
     const client = new Route53UpdateClient("FAKE_KEY_ID", "FAKE_KEY_SECRET");
     const result = await client.getZoneRecords([
@@ -151,10 +141,10 @@ describe(path.basename(__filename, ".test.ts"), () => {
       "test3.tld.",
     ]);
 
-    expect(mockRoute53.listResourceRecordSets).toHaveBeenNthCalledWith(1, {
+    expect(mockRoute53.prototype.listResourceRecordSets).toHaveBeenNthCalledWith(1, {
       HostedZoneId: "TEST_ID_1",
     });
-    expect(mockRoute53.listResourceRecordSets).toHaveBeenNthCalledWith(2, {
+    expect(mockRoute53.prototype.listResourceRecordSets).toHaveBeenNthCalledWith(2, {
       HostedZoneId: "TEST_ID_2",
     });
     expect(result).toEqual([
@@ -193,7 +183,7 @@ describe(path.basename(__filename, ".test.ts"), () => {
     // const dateSpy = jest.spyOn(Date, 'now')
     // dateSpy.mockReturnValue(mockStartDate.getTime())
     // jest.useFakeTimers().setSystemTime(mockStartDate)
-    const mockRoute53 = mock<Route53>();
+    const mockRoute53 = jest.mocked(Route53);
     const mockChange1Response: Partial<ChangeResourceRecordSetsCommandOutput> = {
       ChangeInfo: {
         Id: "CHANGE_ID_1",
@@ -216,7 +206,7 @@ describe(path.basename(__filename, ".test.ts"), () => {
       },
     };
     const mockGetChange2Response: Partial<GetChangeCommandOutput> = mockChange1Response;
-    mockRoute53.changeResourceRecordSets.mockImplementation(request => {
+    mockRoute53.prototype.changeResourceRecordSets.mockImplementation(request => {
       if (request.HostedZoneId === "TEST_ID_1") {
         return mockChange1Response;
       } else {
@@ -224,7 +214,7 @@ describe(path.basename(__filename, ".test.ts"), () => {
       }
     });
     let hasResolvedGetChange2Count = 0;
-    mockRoute53.getChange.mockImplementation(request => {
+    mockRoute53.prototype.getChange.mockImplementation(request => {
       if (request.Id === "CHANGE_ID_1") {
         return mockGetChange1Response;
       }
@@ -236,8 +226,6 @@ describe(path.basename(__filename, ".test.ts"), () => {
       hasResolvedGetChange2Count++;
       return mockGetChange2Response;
     });
-    const mockRoute53Constructor = jest.mocked(Route53);
-    mockRoute53Constructor.mockReturnValue(mockRoute53);
 
     const client = new Route53UpdateClient("FAKE_KEY_ID", "FAKE_KEY_SECRET");
     const resultPromise = client.updateZoneRecords([
@@ -281,7 +269,7 @@ describe(path.basename(__filename, ".test.ts"), () => {
 
     expect(result.get("TEST_ID_1")).toEqual(true);
     expect(result.get("TEST_ID_2")).toEqual(false);
-    expect(mockRoute53.changeResourceRecordSets).toHaveBeenNthCalledWith(1, {
+    expect(mockRoute53.prototype.changeResourceRecordSets).toHaveBeenNthCalledWith(1, {
       HostedZoneId: "TEST_ID_1",
       ChangeBatch: {
         Changes: [
@@ -300,7 +288,7 @@ describe(path.basename(__filename, ".test.ts"), () => {
         ],
       },
     });
-    expect(mockRoute53.changeResourceRecordSets).toHaveBeenNthCalledWith(2, {
+    expect(mockRoute53.prototype.changeResourceRecordSets).toHaveBeenNthCalledWith(2, {
       HostedZoneId: "TEST_ID_2",
       ChangeBatch: {
         Changes: [

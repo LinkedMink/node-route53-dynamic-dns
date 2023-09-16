@@ -1,0 +1,33 @@
+---
+name: Publish Package and Docker Image
+
+concurrency:
+  group: publish
+  cancel-in-progress: true
+
+# yamllint disable-line rule:truthy
+on:
+  release:
+    types: [released]
+
+jobs:
+  build:
+    uses: LinkedMink/.github/.github/workflows/build-npm-package.yml@main
+    with:
+      uploadBuild: true
+  publish-npm:
+    needs: build
+    environment: 
+      name: publish
+    uses: LinkedMink/.github/.github/workflows/publish-npm-package.yml@main
+    with:
+      uploadToTag: ${{ github.ref_name }}
+      uploadedBuildName: ${{ needs.build.outputs.uploadedBuildName }}
+  publish-docker:
+    needs: build
+    environment: 
+      name: publish
+    uses: LinkedMink/.github/.github/workflows/push-docker-hub-npm-package.yml@main
+    with:
+      uploadToTag: ${{ github.ref_name }}
+      uploadedBuildName: ${{ needs.build.outputs.uploadedBuildName }}

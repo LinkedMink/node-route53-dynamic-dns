@@ -185,7 +185,7 @@ export class Route53UpdateClient implements DnsZoneRecordClient {
 
     const hasSucceeded = await this.getChangeStatusUntilInSync(
       changeId,
-      response.ChangeInfo?.Status
+      response.ChangeInfo?.Status as ChangeStatus | undefined
     );
 
     return {
@@ -196,7 +196,7 @@ export class Route53UpdateClient implements DnsZoneRecordClient {
 
   private getChangeStatusUntilInSync = async (
     changeId: string,
-    status: ChangeStatus | string | undefined = "PENDING",
+    status: ChangeStatus = "PENDING",
     startTime = Date.now()
   ): Promise<boolean> => {
     if (status === "INSYNC") {
@@ -213,6 +213,10 @@ export class Route53UpdateClient implements DnsZoneRecordClient {
     this.logger.debug(`getChange request for ID: ${changeId}`);
     const response = await this.client.getChange({ Id: changeId });
 
-    return this.getChangeStatusUntilInSync(changeId, response.ChangeInfo?.Status, startTime);
+    return this.getChangeStatusUntilInSync(
+      changeId,
+      response.ChangeInfo?.Status as ChangeStatus | undefined,
+      startTime
+    );
   };
 }

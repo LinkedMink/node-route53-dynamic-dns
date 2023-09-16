@@ -24,4 +24,4 @@ RUN npm ci
 
 RUN ls -la ./
 
-CMD [ "npm", "run", "start:built" ]
+CMD [ "node", "--enable-source-maps", "build/index.mjs" ]
