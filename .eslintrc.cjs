@@ -22,7 +22,7 @@ const config = {
     node: true,
     es2022: true,
   },
-  ignorePatterns: ["build/**", "coverage/**", "write-package-constants.mjs"],
+  ignorePatterns: ["dist/**", "coverage/**", "write-package-constants.mjs"],
   overrides: [
     {
       files: ["**/*.{m,c,}ts"],

@@ -1,6 +1,6 @@
 {
   "name": "@linkedmink/node-route53-dynamic-dns",
-  "version": "1.0.4",
+  "version": "1.1.0-0",
   "description": "Background process that updates AWS Route 53 DNS address records whenever the public IP of the hosting environment changes",
   "keywords": [
     "AWS",
@@ -28,8 +28,8 @@
     "url": "https://github.com/sponsors/LinkedMink"
   },
   "type": "module",
-  "main": "build/index.mjs",
-  "types": "build/index.d.mts",
+  "main": "dist/index.mjs",
+  "types": "dist/index.d.mts",
   "repository": {
     "type": "git",
     "url": "https://github.com/LinkedMink/node-route53-dynamic-dns.git"
@@ -39,10 +39,11 @@
   },
   "scripts": {
     "start": "tsx watch --tsconfig src/tsconfig.json src/index.mts",
-    "start:built": "node --enable-source-maps build/index.mjs",
+    "start:bun": "bun --watch --tsconfig-override src/tsconfig.json src/index.mts",
+    "start:built": "node --enable-source-maps dist/index.mjs",
     "cmd:iam-policy": "tsx --tsconfig src/tsconfig.json src/index.mts iam-policy",
     "prebuild": "tsx write-package-constants.mts",
-    "build": "rimraf build && tsc --project src/tsconfig.json",
+    "build": "rimraf dist && tsc --project src/tsconfig.json",
     "prepack": "npm run build",
     "test": "jest --watchAll",
     "test:ci": "jest --coverage --ci",
@@ -50,13 +51,13 @@
     "postinstall": "husky install || cd .",
     "lint": "eslint {src,tests}/**/*.{m,c,}ts *.{,m,c}{j,t}s",
     "doc": "typedoc",
-    "clean": "rimraf build coverage *.log",
+    "clean": "rimraf dist coverage *.log",
     "preversion": "npm run lint && npm run test:ci",
     "version": "npm run build && git add .",
     "postversion": "bash ./docker/build.sh"
   },
   "bin": {
-    "node-route53-dynamic-dns": "./build/index.mjs"
+    "node-route53-dynamic-dns": "./dist/index.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-route-53": "^3.178.0",
@@ -70,9 +71,10 @@
     "@tsconfig/node18": "^18.2.2",
     "@types/eslint": "^8.4.6",
     "@types/jest": "^29.0.3",
-    "@types/node": "^18.11.10",
+    "@types/node": "^20.6.3",
     "@typescript-eslint/eslint-plugin": "^6.7.0",
     "@typescript-eslint/parser": "^6.7.0",
+    "bun-types": "^1.0.3",
     "eslint": "^8.24.0",
     "eslint-config-prettier": "^9.0.0",
     "husky": "^8.0.1",

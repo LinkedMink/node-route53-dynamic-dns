@@ -24,4 +24,4 @@ RUN npm ci
 
 RUN ls -la ./
 
-CMD [ "node", "--enable-source-maps", "build/index.mjs" ]
+CMD [ "node", "--enable-source-maps", "dist/index.mjs" ]
