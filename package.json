@@ -35,7 +35,8 @@
     "url": "https://github.com/LinkedMink/node-route53-dynamic-dns.git"
   },
   "engines": {
-    "node": ">=16"
+    "node": ">=18",
+    "npm": ">=9"
   },
   "scripts": {
     "start": "tsx watch --tsconfig src/tsconfig.json src/index.mts",
