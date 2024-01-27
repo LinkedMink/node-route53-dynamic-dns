@@ -1,0 +1,19 @@
+# The bun rumtime doesn't since it's missing the 'node:dgram' module. This is left for reference and future experimentation.
+FROM oven/bun:1-alpine
+
+ARG ENVIRONMENT=production
+
+ENV NODE_ENV ENVIRONMENT
+ENV IS_CONTAINER_ENV true
+
+WORKDIR /home/bun
+
+COPY --chown=1000:1000 . .
+
+USER bun
+
+RUN bun install --frozen-lockfile --production
+
+RUN ls -la ./
+
+CMD [ "bun", "run", "dist/index.mjs" ]

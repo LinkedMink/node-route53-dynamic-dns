@@ -16,5 +16,5 @@
   "[markdown]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "cSpell.words": ["linkedmink", "postversion", "preversion"]
+  "cSpell.words": ["Convertable", "linkedmink", "postversion", "preversion"]
 }

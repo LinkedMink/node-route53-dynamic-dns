@@ -16,14 +16,9 @@ export default (config: EnvironmentConfig) => {
   const main = async () => {
     const logger = initializeLogging(config);
 
-    const awsAccessKeyId = config.getString(ConfigKey.AwsAccessKeyId);
-    const awsAccessKeySecret = config.getString(ConfigKey.AwsAccessKeySecret);
-    const route53Client: DnsZoneRecordClient = new Route53UpdateClient(
-      awsAccessKeyId,
-      awsAccessKeySecret
-    );
+    const route53Client: DnsZoneRecordClient = new Route53UpdateClient();
 
-    logger.verbose(`Get accessible DNS zone's for access key ID: ${awsAccessKeyId}`);
+    logger.verbose("Get accessible DNS zone's");
 
     const inputHostnames = config.getJson<string[]>(ConfigKey.HostnamesToUpdate);
     const dnsRecords = inputHostnames.map(validateNormalizeDnsRecord);

@@ -1,0 +1,18 @@
+FROM node:20-alpine
+
+ARG ENVIRONMENT=production
+
+ENV NODE_ENV ENVIRONMENT
+ENV IS_CONTAINER_ENV true
+
+WORKDIR /home/node
+
+COPY --chown=1000:1000 . .
+
+USER node
+
+RUN npm ci --omit dev
+
+RUN ls -la ./
+
+CMD [ "node", "--enable-source-maps", "dist/index.mjs" ]

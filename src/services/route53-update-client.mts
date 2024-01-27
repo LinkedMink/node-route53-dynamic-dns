@@ -16,13 +16,9 @@ export class Route53UpdateClient implements DnsZoneRecordClient {
   private readonly logger = loggerForModuleUrl(import.meta.url);
   private readonly client: Route53;
 
-  constructor(awsAccessKeyId: string, awsAccessKeySecret: string) {
+  constructor() {
     this.client = new Route53({
       region: NO_REGION,
-      credentials: {
-        accessKeyId: awsAccessKeyId,
-        secretAccessKey: awsAccessKeySecret,
-      },
     });
   }
 
