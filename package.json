@@ -68,7 +68,7 @@
     "winston": "^3.8.2"
   },
   "devDependencies": {
-    "@tsconfig/node18": "^18.2.2",
+    "@tsconfig/node20": "^20.1.2",
     "@types/bun": "^1.0.3",
     "@types/eslint": "^8.4.6",
     "@types/jest": "^29.0.3",
