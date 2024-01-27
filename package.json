@@ -1,6 +1,6 @@
 {
   "name": "@linkedmink/node-route53-dynamic-dns",
-  "version": "1.1.0-0",
+  "version": "1.1.0-1",
   "description": "Background process that updates AWS Route 53 DNS address records whenever the public IP of the hosting environment changes",
   "keywords": [
     "AWS",
@@ -40,7 +40,6 @@
   },
   "scripts": {
     "start": "tsx watch --tsconfig src/tsconfig.json src/index.mts",
-    "start:bun": "bun --watch --tsconfig-override src/tsconfig.json src/index.mts",
     "start:built": "node --enable-source-maps dist/index.mjs",
     "cmd:iam-policy": "tsx --tsconfig src/tsconfig.json src/index.mts iam-policy",
     "prebuild": "tsx write-package-constants.mts",

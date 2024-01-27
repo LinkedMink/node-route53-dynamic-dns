@@ -18,12 +18,7 @@ export default (config: EnvironmentConfig) => {
 
     logger.info("Initializing App");
 
-    const awsAccessKeyId = config.getString(ConfigKey.AwsAccessKeyId);
-    const awsAccessKeySecret = config.getString(ConfigKey.AwsAccessKeySecret);
-    const route53Client: DnsZoneRecordClient = new Route53UpdateClient(
-      awsAccessKeyId,
-      awsAccessKeySecret
-    );
+    const route53Client: DnsZoneRecordClient = new Route53UpdateClient();
 
     const inputHostnames = config.getJson<string[]>(ConfigKey.HostnamesToUpdate);
     const isCachedRecordsEnabled = config.getBool(ConfigKey.CacheDnsRecords);

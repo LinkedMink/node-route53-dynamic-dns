@@ -12,9 +12,6 @@ export enum ConfigKey {
   CacheDnsRecords = "CACHE_DNS_RECORDS",
 
   HostnamesToUpdate = "HOSTNAMES_TO_UPDATE",
-
-  AwsAccessKeyId = "AWS_ACCESS_KEY_ID",
-  AwsAccessKeySecret = "AWS_ACCESS_KEY_SECRET",
 }
 
 export const configDefaultMap: Map<ConfigKey, string> = new Map([

@@ -19,15 +19,11 @@ describe(path.basename(__filename, ".test.ts"), () => {
   test("should construct Route53 client with access key when constructed", () => {
     const mockRoute53 = jest.mocked(Route53);
 
-    const result = new Route53UpdateClient("FAKE_KEY_ID", "FAKE_KEY_SECRET");
+    const result = new Route53UpdateClient();
 
     expect(result).toBeTruthy();
     expect(mockRoute53).toHaveBeenCalledWith({
       region: "REGION",
-      credentials: {
-        accessKeyId: "FAKE_KEY_ID",
-        secretAccessKey: "FAKE_KEY_SECRET",
-      },
     });
   });
 
@@ -36,7 +32,7 @@ describe(path.basename(__filename, ".test.ts"), () => {
     const mockResponse: Partial<ListHostedZonesCommandOutput> = {};
     mockRoute53.prototype.listHostedZones.mockResolvedValue(mockResponse as never);
 
-    const client = new Route53UpdateClient("FAKE_KEY_ID", "FAKE_KEY_SECRET");
+    const client = new Route53UpdateClient();
     const action = client.getZonesForDnsRecords(["test.mydomain.tld."]);
 
     await expect(action).rejects.toBeInstanceOf(Error);
@@ -60,7 +56,7 @@ describe(path.basename(__filename, ".test.ts"), () => {
     };
     mockRoute53.prototype.listHostedZones.mockResolvedValue(mockResponse as never);
 
-    const client = new Route53UpdateClient("FAKE_KEY_ID", "FAKE_KEY_SECRET");
+    const client = new Route53UpdateClient();
     const result = await client.getZonesForDnsRecords([
       "sub1.test1.tld.",
       "sub2.test1.tld.",
@@ -132,7 +128,7 @@ describe(path.basename(__filename, ".test.ts"), () => {
       }
     });
 
-    const client = new Route53UpdateClient("FAKE_KEY_ID", "FAKE_KEY_SECRET");
+    const client = new Route53UpdateClient();
     const result = await client.getZoneRecords([
       "sub1.test1.tld.",
       "sub2.test1.tld.",
@@ -227,7 +223,7 @@ describe(path.basename(__filename, ".test.ts"), () => {
       return mockGetChange2Response;
     });
 
-    const client = new Route53UpdateClient("FAKE_KEY_ID", "FAKE_KEY_SECRET");
+    const client = new Route53UpdateClient();
     const resultPromise = client.updateZoneRecords([
       {
         zoneId: "TEST_ID_1",

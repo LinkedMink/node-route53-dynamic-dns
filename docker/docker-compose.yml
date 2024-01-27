@@ -2,7 +2,7 @@
 services:
   node-route53-dynamic-dns:
     image: linkedmink/node-route53-dynamic-dns:latest
-    command: [ "npm", "run", "start:built", "--", "--env-file", "/run/secrets/.env.secrets" ]
+    command: [ "node", "--enable-source-maps", "dist/index.mjs", "--env-file", "/run/secrets/.env.secrets" ]
     ports:
       - 61080:61080
     restart: always
