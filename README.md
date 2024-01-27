@@ -17,7 +17,6 @@ This can be useful for home or small business networks where an ISP doesn't issu
 ## Prerequisites
 
 - NodeJS >= 18 (Tested)
-- NPM >= 9 (Tested)
 - Hosted Zones with AWS Route 53
 
 ## Usage
