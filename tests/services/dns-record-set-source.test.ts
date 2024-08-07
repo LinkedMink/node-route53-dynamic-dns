@@ -1,8 +1,8 @@
 import { mock } from "jest-mock-extended";
 import path from "node:path";
-import { DnsRecordsEvent } from "../../src/constants/events.mjs";
-import { Route53DnsRecordSetStore } from "../../src/services/dns-record-set-source.mjs";
-import { DnsZoneRecordClient, DnsZoneRecordSets } from "../../src/types/dns-zone-record-client.mjs";
+import { DnsRecordsEvent } from "../../src/constants/events.js";
+import { Route53DnsRecordSetStore } from "../../src/services/dns-record-set-source.js";
+import { DnsZoneRecordClient, DnsZoneRecordSets } from "../../src/types/dns-zone-record-client.js";
 
 describe(path.basename(__filename, ".test.ts"), () => {
   test("should thorw when getRecords called and remote source empty on first attempt", async () => {

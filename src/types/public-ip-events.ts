@@ -1,5 +1,5 @@
 import type EventEmitter from "node:events";
-import type { PublicIpEvent } from "../constants/events.mjs";
+import type { PublicIpEvent } from "../constants/events.js";
 
 export interface IpAddresses {
   v4: string | null;

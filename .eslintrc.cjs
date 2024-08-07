@@ -22,7 +22,7 @@ const config = {
     node: true,
     es2022: true,
   },
-  ignorePatterns: ["dist/**", "coverage/**", "write-package-constants.mjs"],
+  ignorePatterns: ["dist/**", "coverage/**", "write-package-constants.js"],
   overrides: [
     {
       files: ["**/*.{m,c,}ts"],
@@ -36,7 +36,7 @@ const config = {
       extends: [
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended",
-        "plugin:@typescript-eslint/recommended-requiring-type-checking",
+        "plugin:@typescript-eslint/recommended-type-checked",
         "prettier",
       ],
       parserOptions: {
@@ -67,12 +67,11 @@ const config = {
       ...tsRecommendedRules,
     },
     {
-      files: ["*.{c,}js"],
+      files: ["*.{,c,m}js"],
       extends: ["eslint:recommended"],
     },
     {
-      files: ["*.mjs"],
-      extends: ["eslint:recommended"],
+      files: ["*.{,m}js"],
       parserOptions: {
         sourceType: "module",
       },

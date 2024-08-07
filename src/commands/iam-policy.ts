@@ -1,13 +1,13 @@
 import chalk from "chalk";
 import { Command } from "commander";
-import { ConfigKey } from "../constants/config.mjs";
-import { PACKAGE_VERSION } from "../constants/version.mjs";
-import { EnvironmentConfig } from "../environment/environment-config.mjs";
-import { initializeLogging } from "../environment/logger.mjs";
-import { createRoute53PolicyForZones } from "../functions/aws-iam-policy.mjs";
-import { validateNormalizeDnsRecord } from "../functions/validate.mjs";
-import { Route53UpdateClient } from "../services/route53-update-client.mjs";
-import { DnsZoneRecordClient } from "../types/dns-zone-record-client.mjs";
+import { ConfigKey } from "../constants/config.js";
+import { PACKAGE_VERSION } from "../constants/version.js";
+import { EnvironmentConfig } from "../environment/environment-config.js";
+import { initializeLogging } from "../environment/logger.js";
+import { createRoute53PolicyForZones } from "../functions/aws-iam-policy.js";
+import { validateNormalizeDnsRecord } from "../functions/validate.js";
+import { Route53UpdateClient } from "../services/route53-update-client.js";
+import { DnsZoneRecordClient } from "../types/dns-zone-record-client.js";
 
 /**
  * @todo Add subcommands to write IAM policy to file or create user via AWS SDK

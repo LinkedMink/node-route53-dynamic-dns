@@ -1,5 +1,5 @@
 import path from "node:path";
-import { PublicIpClient } from "../../src/event-handlers/public-ip-event-emitter.mjs";
+import { PublicIpClient } from "../../src/event-handlers/public-ip-event-emitter.js";
 
 /**
  * @todo not sure why 'public-ip' isn't being detected as ESM

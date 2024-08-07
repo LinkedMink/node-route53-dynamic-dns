@@ -1,5 +1,5 @@
 import path from "node:path";
-import { getEnumKeys } from "../../src/functions/convert.mjs";
+import { getEnumKeys } from "../../src/functions/convert.js";
 
 describe(path.basename(__filename, ".test.ts"), () => {
   test("should return array of enum keys when string enum", () => {

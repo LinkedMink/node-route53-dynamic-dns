@@ -1,16 +1,16 @@
 import { mock } from "jest-mock-extended";
 import path from "node:path";
 import winston from "winston";
-import { LogLevel } from "../../src/constants/logging.mjs";
-import { EnvironmentConfig } from "../../src/environment/environment-config.mjs";
+import { LogLevel } from "../../src/constants/logging.js";
+import { EnvironmentConfig } from "../../src/environment/environment-config.js";
 import {
   initializeLogging,
   loggerForLabel,
   loggerForModuleUrl,
   logWhenEnabled,
-} from "../../src/environment/logger.mjs";
+} from "../../src/environment/logger.js";
 
-jest.mock("../../src/functions/format.mjs");
+jest.mock("../../src/functions/format.js");
 
 describe(path.basename(__filename, ".test.ts"), () => {
   beforeEach(() => {
@@ -32,7 +32,7 @@ describe(path.basename(__filename, ".test.ts"), () => {
       };
 
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const { initializeLogging } = require("../../src/environment/logger.mjs");
+      const { initializeLogging } = require("../../src/environment/logger.js");
       const result = initializeLogging(mockConfig as EnvironmentConfig);
 
       expect(result.level).toEqual("info");
@@ -47,7 +47,7 @@ describe(path.basename(__filename, ".test.ts"), () => {
       };
 
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const { initializeLogging } = require("../../src/environment/logger.mjs");
+      const { initializeLogging } = require("../../src/environment/logger.js");
       const result = initializeLogging(mockConfig as EnvironmentConfig);
 
       expect(result.level).toEqual("info");
@@ -64,7 +64,7 @@ describe(path.basename(__filename, ".test.ts"), () => {
       };
 
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const { initializeLogging } = require("../../src/environment/logger.mjs");
+      const { initializeLogging } = require("../../src/environment/logger.js");
       const action = () => initializeLogging(mockConfig as EnvironmentConfig);
 
       expect(action).toThrow();
@@ -77,7 +77,7 @@ describe(path.basename(__filename, ".test.ts"), () => {
         getStringOrNull: jest.fn().mockReturnValue("test.log"),
       };
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const { initializeLogging } = require("../../src/environment/logger.mjs");
+      const { initializeLogging } = require("../../src/environment/logger.js");
       const globalLogger = initializeLogging(mockConfig as EnvironmentConfig);
       const errorSpy = jest.spyOn(globalLogger, "error").mockReturnThis();
 
@@ -115,7 +115,7 @@ describe(path.basename(__filename, ".test.ts"), () => {
   describe(loggerForModuleUrl.name, () => {
     test("should return logger labeled by module name when called with module URL", () => {
       const result = loggerForModuleUrl(
-        `file://${process.platform === "win32" ? "" : "localhost/"}test-module.mts`
+        `file://${process.platform === "win32" ? "" : "localhost/"}test.ts`
       );
 
       expect(result).toBe(winston.loggers.get("test-module"));

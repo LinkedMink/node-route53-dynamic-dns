@@ -4,8 +4,7 @@
 .husky/
 .vscode/
 coverage/
-docker/*
-!docker/Dockerfile
+docker/
 docs/
 tests/
 .env*
@@ -18,4 +17,4 @@ jest*
 template.env
 tsconfig.json
 typedoc.json
-write-package-constants.mts
+write-package-constants.ts

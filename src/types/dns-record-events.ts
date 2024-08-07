@@ -1,5 +1,5 @@
-import type { DnsRecordsEvent } from "../constants/events.mjs";
-import type { DnsAddressRecordType, DnsZoneRecordSets } from "./dns-zone-record-client.mjs";
+import type { DnsRecordsEvent } from "../constants/events.js";
+import type { DnsAddressRecordType, DnsZoneRecordSets } from "./dns-zone-record-client.js";
 
 export interface DnsAddressRecord {
   name: string;

@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import { PackageJson } from "type-fest";
 import packageData from "./package.json";
 
-const VERSION_CONSTANT_PATH = "./src/constants/version.mts";
+const VERSION_CONSTANT_PATH = "./src/constants/version.ts";
 
 const packageJson = packageData as PackageJson;
 const packageName = packageJson.name;

@@ -1,8 +1,8 @@
-import { loggerForModuleUrl } from "../environment/logger.mjs";
-import { DnsRecordSetSource } from "../types/dns-record-events.mjs";
-import { DnsZoneRecordClient } from "../types/dns-zone-record-client.mjs";
-import { IpAddresses, PublicIpState } from "../types/public-ip-events.mjs";
-import { Disposable } from "../types/utility.mjs";
+import { loggerForModuleUrl } from "../environment/logger.js";
+import { DnsRecordSetSource } from "../types/dns-record-events.js";
+import { DnsZoneRecordClient } from "../types/dns-zone-record-client.js";
+import { IpAddresses, PublicIpState } from "../types/public-ip-events.js";
+import { Disposable } from "../types/utility.js";
 
 export class Route53AddressRecordUpdater implements Disposable {
   private readonly logger = loggerForModuleUrl(import.meta.url);

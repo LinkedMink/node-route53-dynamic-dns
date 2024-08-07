@@ -5,7 +5,7 @@ import {
   ConfigKey,
   IS_CONTAINERIZED_ENV_VAR,
   NodeEnv,
-} from "../constants/config.mjs";
+} from "../constants/config.js";
 
 export class ConfigError extends Error {}
 

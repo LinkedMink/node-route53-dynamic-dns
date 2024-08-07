@@ -1,16 +1,16 @@
 import { Command } from "commander";
-import { ConfigKey } from "../constants/config.mjs";
-import { PublicIpEvent, DnsRecordsEvent } from "../constants/events.mjs";
-import { PACKAGE_VERSION } from "../constants/version.mjs";
-import { EnvironmentConfig } from "../environment/environment-config.mjs";
-import { initializeLogging } from "../environment/logger.mjs";
-import { HealthCheckServer } from "../event-handlers/health-check-server.mjs";
-import { PublicIpClient } from "../event-handlers/public-ip-event-emitter.mjs";
-import { Route53AddressRecordUpdater } from "../event-handlers/route53-address-record-updater.mjs";
-import { Route53DnsRecordSetStore } from "../services/dns-record-set-source.mjs";
-import { Route53UpdateClient } from "../services/route53-update-client.mjs";
-import { DnsZoneRecordClient } from "../types/dns-zone-record-client.mjs";
-import { PublicIpEventEmitter } from "../types/public-ip-events.mjs";
+import { ConfigKey } from "../constants/config.js";
+import { PublicIpEvent, DnsRecordsEvent } from "../constants/events.js";
+import { PACKAGE_VERSION } from "../constants/version.js";
+import { EnvironmentConfig } from "../environment/environment-config.js";
+import { initializeLogging } from "../environment/logger.js";
+import { HealthCheckServer } from "../event-handlers/health-check-server.js";
+import { PublicIpClient } from "../event-handlers/public-ip-event-emitter.js";
+import { Route53AddressRecordUpdater } from "../event-handlers/route53-address-record-updater.js";
+import { Route53DnsRecordSetStore } from "../services/dns-record-set-source.js";
+import { Route53UpdateClient } from "../services/route53-update-client.js";
+import { DnsZoneRecordClient } from "../types/dns-zone-record-client.js";
+import { PublicIpEventEmitter } from "../types/public-ip-events.js";
 
 export default (config: EnvironmentConfig) => {
   const main = async () => {

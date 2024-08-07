@@ -1,14 +1,14 @@
 import { mock } from "jest-mock-extended";
 import path from "node:path";
 import { EventEmitter } from "node:stream";
-import { Route53AddressRecordUpdater } from "../../src/event-handlers/route53-address-record-updater.mjs";
-import { DnsRecordSetSource } from "../../src/types/dns-record-events.mjs";
+import { Route53AddressRecordUpdater } from "../../src/event-handlers/route53-address-record-updater.js";
+import { DnsRecordSetSource } from "../../src/types/dns-record-events.js";
 import {
   DnsAddressRecordSet,
   DnsZoneRecordClient,
   DnsZoneRecordSets,
-} from "../../src/types/dns-zone-record-client.mjs";
-import { PublicIpState } from "../../src/types/public-ip-events.mjs";
+} from "../../src/types/dns-zone-record-client.js";
+import { PublicIpState } from "../../src/types/public-ip-events.js";
 
 const getMockRecords = (
   recordName: string,

@@ -1,5 +1,5 @@
 import path from "node:path";
-import { isStringConvertable } from "../../src/functions/type-check.mjs";
+import { isStringConvertable } from "../../src/functions/type-check.js";
 
 describe(path.basename(__filename, ".test.ts"), () => {
   test("should return true when type has toString function", () => {

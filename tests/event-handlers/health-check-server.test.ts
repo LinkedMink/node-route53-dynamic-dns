@@ -2,9 +2,9 @@ import { jest } from "@jest/globals";
 import { mock } from "jest-mock-extended";
 import { createServer, IncomingMessage, RequestListener, Server, ServerResponse } from "node:http";
 import path from "node:path";
-import { HealthCheckServer } from "../../src/event-handlers/health-check-server.mjs";
-import { DnsAddressRecordState } from "../../src/types/dns-record-events.mjs";
-import { PublicIpState } from "../../src/types/public-ip-events.mjs";
+import { HealthCheckServer } from "../../src/event-handlers/health-check-server.js";
+import { DnsAddressRecordState } from "../../src/types/dns-record-events.js";
+import { PublicIpState } from "../../src/types/public-ip-events.js";
 
 jest.mock("node:http");
 

@@ -2,11 +2,11 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as winston from "winston";
 import TransportStream from "winston-transport";
-import { ConfigKey } from "../constants/config.mjs";
-import { DEFAULT_LOGGER_LABEL, DEFAULT_LOG_LEVEL, LogLevel } from "../constants/logging.mjs";
-import { getEnumKeys } from "../functions/convert.mjs";
-import { formatError } from "../functions/format.mjs";
-import { EnvironmentConfig } from "./environment-config.mjs";
+import { ConfigKey } from "../constants/config.js";
+import { DEFAULT_LOGGER_LABEL, DEFAULT_LOG_LEVEL, LogLevel } from "../constants/logging.js";
+import { getEnumKeys } from "../functions/convert.js";
+import { formatError } from "../functions/format.js";
+import { EnvironmentConfig } from "./environment-config.js";
 
 const getDefaultFormat = (label: string): winston.Logform.Format => {
   return winston.format.combine(

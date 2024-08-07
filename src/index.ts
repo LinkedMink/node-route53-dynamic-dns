@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
 import { Command } from "commander";
-import iamPolicyCommand from "./commands/iam-policy.mjs";
-import serviceCommand from "./commands/service.mjs";
-import { PACKAGE_UNSCOPED_NAME } from "./constants/version.mjs";
-import { EnvironmentConfig } from "./environment/environment-config.mjs";
+import iamPolicyCommand from "./commands/iam-policy.js";
+import serviceCommand from "./commands/service.js";
+import { PACKAGE_UNSCOPED_NAME } from "./constants/version.js";
+import { EnvironmentConfig } from "./environment/environment-config.js";
 
 interface RootCommandOptions {
   envFile: string;

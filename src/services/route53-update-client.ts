@@ -1,14 +1,14 @@
 import { Change, ChangeStatus, Route53 } from "@aws-sdk/client-route-53";
 import { setTimeout } from "node:timers/promises";
-import { CHANGE_INSYNC_INTERVAL_MS, CHANGE_INSYNC_LIMIT_MS } from "../constants/behavior.mjs";
-import { LogLevel } from "../constants/logging.mjs";
-import { loggerForModuleUrl, logWhenEnabled } from "../environment/logger.mjs";
-import { formatError } from "../functions/format.mjs";
+import { CHANGE_INSYNC_INTERVAL_MS, CHANGE_INSYNC_LIMIT_MS } from "../constants/behavior.js";
+import { LogLevel } from "../constants/logging.js";
+import { loggerForModuleUrl, logWhenEnabled } from "../environment/logger.js";
+import { formatError } from "../functions/format.js";
 import {
   DnsAddressRecordSet,
   DnsZoneRecordClient,
   DnsZoneRecordSets,
-} from "../types/dns-zone-record-client.mjs";
+} from "../types/dns-zone-record-client.js";
 
 const NO_REGION = "REGION";
 
@@ -181,7 +181,7 @@ export class Route53UpdateClient implements DnsZoneRecordClient {
 
     const hasSucceeded = await this.getChangeStatusUntilInSync(
       changeId,
-      response.ChangeInfo?.Status as ChangeStatus | undefined
+      response.ChangeInfo?.Status
     );
 
     return {
@@ -209,10 +209,6 @@ export class Route53UpdateClient implements DnsZoneRecordClient {
     this.logger.debug(`getChange request for ID: ${changeId}`);
     const response = await this.client.getChange({ Id: changeId });
 
-    return this.getChangeStatusUntilInSync(
-      changeId,
-      response.ChangeInfo?.Status as ChangeStatus | undefined,
-      startTime
-    );
+    return this.getChangeStatusUntilInSync(changeId, response.ChangeInfo?.Status, startTime);
   };
 }

@@ -1,5 +1,5 @@
 import path from "node:path";
-import { validateNormalizeDnsRecord } from "../../src/functions/validate.mjs";
+import { validateNormalizeDnsRecord } from "../../src/functions/validate.js";
 
 describe(path.basename(__filename, ".test.ts"), () => {
   test("should return DNS records with matching format from AWS when valid", () => {

@@ -4,11 +4,11 @@ import { IpNotFoundError, publicIpv4, publicIpv6 } from "public-ip";
 import {
   MINIMUM_IP_RETRIEVE_TIMEOUT_MS,
   MINIMUM_IP_RETRIEVE_UPDATE_DIFF_MS,
-} from "../constants/behavior.mjs";
-import { PublicIpEvent } from "../constants/events.mjs";
-import { loggerForModuleUrl } from "../environment/logger.mjs";
-import { formatError } from "../functions/format.mjs";
-import { PublicIpEventEmitter, PublicIpState } from "../types/public-ip-events.mjs";
+} from "../constants/behavior.js";
+import { PublicIpEvent } from "../constants/events.js";
+import { loggerForModuleUrl } from "../environment/logger.js";
+import { formatError } from "../functions/format.js";
+import { PublicIpEventEmitter, PublicIpState } from "../types/public-ip-events.js";
 
 export class PublicIpClient extends EventEmitter implements PublicIpEventEmitter {
   private readonly logger = loggerForModuleUrl(import.meta.url);

@@ -1,8 +1,8 @@
 import dotenv from "dotenv";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { ConfigKey } from "../../src/constants/config.mjs";
-import { EnvironmentConfig } from "../../src/environment/environment-config.mjs";
+import { ConfigKey } from "../../src/constants/config.js";
+import { EnvironmentConfig } from "../../src/environment/environment-config.js";
 
 jest.mock("dotenv");
 jest.mock("node:fs/promises");

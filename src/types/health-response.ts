@@ -1,5 +1,5 @@
-import type { DnsAddressRecord } from "./dns-record-events.mjs";
-import type { IpAddresses } from "./public-ip-events.mjs";
+import type { DnsAddressRecord } from "./dns-record-events.js";
+import type { IpAddresses } from "./public-ip-events.js";
 
 export interface HealthCheckResponse {
   publicIpAddresses: IpAddresses | null;

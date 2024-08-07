@@ -28,8 +28,8 @@
     "url": "https://github.com/sponsors/LinkedMink"
   },
   "type": "module",
-  "main": "dist/index.mjs",
-  "types": "dist/index.d.mts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/LinkedMink/node-route53-dynamic-dns.git"
@@ -39,16 +39,16 @@
     "npm": ">=9"
   },
   "scripts": {
-    "start": "tsx watch --tsconfig src/tsconfig.json src/index.mts",
-    "start:built": "node --enable-source-maps dist/index.mjs",
-    "cmd:iam-policy": "tsx --tsconfig src/tsconfig.json src/index.mts iam-policy",
-    "prebuild": "tsx write-package-constants.mts",
-    "build": "rimraf dist && tsc --project src/tsconfig.json",
+    "start": "tsx watch --tsconfig src/tsconfig.json src/index.ts",
+    "start:built": "node --enable-source-maps dist/index.js",
+    "cmd:iam-policy": "tsx --tsconfig src/tsconfig.json src/index.ts iam-policy",
+    "prebuild": "tsx write-package-constants.ts",
+    "build": "tsc --project src/tsconfig.json",
     "prepack": "npm run build",
     "test": "jest --watchAll",
     "test:ci": "jest --coverage --ci",
     "test:debug": "jest --cache=false --detectOpenHandles --runInBand --watchAll",
-    "postinstall": "husky install || cd .",
+    "postinstall": "husky || cd .",
     "lint": "eslint {src,tests}/**/*.{m,c,}ts *.{,m,c}{j,t}s",
     "doc": "typedoc",
     "clean": "rimraf dist coverage *.log",
@@ -57,24 +57,23 @@
     "postversion": "bash ./docker/build.sh"
   },
   "bin": {
-    "node-route53-dynamic-dns": "./dist/index.mjs"
+    "node-route53-dynamic-dns": "./dist/index.js"
   },
   "dependencies": {
     "@aws-sdk/client-route-53": "^3.178.0",
     "chalk": "^5.0.1",
-    "commander": "^11.0.0",
+    "commander": "^12.0.0",
     "dotenv": "^16.0.2",
-    "public-ip": "^6.0.1",
+    "public-ip": "^7.0.1",
     "winston": "^3.8.2"
   },
   "devDependencies": {
     "@tsconfig/node20": "^20.1.2",
-    "@types/bun": "^1.0.3",
     "@types/eslint": "^8.4.6",
     "@types/jest": "^29.0.3",
     "@types/node": "^20.6.3",
-    "@typescript-eslint/eslint-plugin": "^6.7.0",
-    "@typescript-eslint/parser": "^6.7.0",
+    "@typescript-eslint/eslint-plugin": "^7.5.0",
+    "@typescript-eslint/parser": "^7.5.0",
     "eslint": "^8.24.0",
     "eslint-config-prettier": "^9.0.0",
     "husky": "^9.0.6",
@@ -82,13 +81,13 @@
     "jest-mock-extended": "^3.0.1",
     "lint-staged": "^15.2.0",
     "prettier": "^3.0.3",
-    "rimraf": "^5.0.1",
+    "rimraf": "^6.0.1",
     "ts-jest": "^29.0.2",
     "ts-jest-mock-import-meta": "^1.0.0",
     "ts-node": "^10.9.1",
     "tsx": "^4.7.0",
     "type-fest": "^4.3.1",
-    "typedoc": "^0.25.1",
-    "typescript": "^5.2.2"
+    "typedoc": "^0.26.5",
+    "typescript": "^5.5.4"
   }
 }

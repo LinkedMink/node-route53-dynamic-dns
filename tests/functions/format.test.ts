@@ -1,5 +1,5 @@
 import path from "node:path";
-import { formatError } from "../../src/functions/format.mjs";
+import { formatError } from "../../src/functions/format.js";
 
 describe(path.basename(__filename, ".test.ts"), () => {
   test("should format as stack trace when type is error", () => {
@@ -33,6 +33,6 @@ describe(path.basename(__filename, ".test.ts"), () => {
 
     const result = formatError(error);
 
-    expect(result).toContain("format.mts:12");
+    expect(result).toContain("format.ts:12");
   });
 });

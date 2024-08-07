@@ -43,7 +43,7 @@ const config: Config.InitialOptions = {
               path: "node_modules/ts-jest-mock-import-meta",
               options: {
                 metaObjectReplacement: {
-                  url: `file://${process.platform === "win32" ? "" : "localhost/"}test.mts`,
+                  url: `file://${process.platform === "win32" ? "" : "localhost/"}test.ts`,
                 },
               },
             },

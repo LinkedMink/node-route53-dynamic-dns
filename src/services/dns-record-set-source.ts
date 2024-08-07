@@ -1,9 +1,9 @@
 import EventEmitter from "events";
-import { DnsRecordsEvent } from "../constants/events.mjs";
-import { loggerForModuleUrl } from "../environment/logger.mjs";
-import { validateNormalizeDnsRecord } from "../functions/validate.mjs";
-import { DnsRecordSetSource } from "../types/dns-record-events.mjs";
-import { DnsZoneRecordClient, DnsZoneRecordSets } from "../types/dns-zone-record-client.mjs";
+import { DnsRecordsEvent } from "../constants/events.js";
+import { loggerForModuleUrl } from "../environment/logger.js";
+import { validateNormalizeDnsRecord } from "../functions/validate.js";
+import { DnsRecordSetSource } from "../types/dns-record-events.js";
+import { DnsZoneRecordClient, DnsZoneRecordSets } from "../types/dns-zone-record-client.js";
 
 export class Route53DnsRecordSetStore extends EventEmitter implements DnsRecordSetSource {
   private readonly logger = loggerForModuleUrl(import.meta.url);

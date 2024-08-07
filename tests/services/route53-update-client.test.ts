@@ -6,7 +6,7 @@ import {
   Route53,
 } from "@aws-sdk/client-route-53";
 import path from "node:path";
-import { Route53UpdateClient } from "../../src/services/route53-update-client.mjs";
+import { Route53UpdateClient } from "../../src/services/route53-update-client.js";
 
 jest.mock("@aws-sdk/client-route-53");
 jest.mock("node:timers/promises", () => ({
